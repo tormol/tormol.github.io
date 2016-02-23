@@ -797,7 +797,7 @@
         startSearch();
 
         // Draw a convenient sidebar of known crates if we have a listing
-        if (rootPath === '../') {
+        if (rootPath === '../' || rootPath === '') {
             var sidebar = $('.sidebar');
             var div = $('<div>').attr('class', 'block crate');
             div.append($('<h3>').text('Crates'));
@@ -816,7 +816,7 @@
                 }
                 if (rawSearchIndex[crates[i]].items[0]) {
                     var desc = rawSearchIndex[crates[i]].items[0][3];
-                    var link = $('<a>', {'href': '../' + crates[i] + '/index.html',
+                    var link = $('<a>', {'href': rootPath + crates[i] + '/index.html',
                                          'title': plainSummaryLine(desc),
                                          'class': klass}).text(crates[i]);
                     ul.append($('<li>').append(link));
@@ -832,6 +832,8 @@
     function initSidebarItems(items) {
         var sidebar = $('.sidebar');
         var current = window.sidebarCurrent;
+        if (current.relpath === '')
+        	return;
 
         function block(shortty, longty) {
             var filtered = items[shortty];
