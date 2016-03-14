@@ -46,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-0' class='srclink' href='../src/nbstr/lib.rs.html#17-66' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-0' class='srclink' href='../src/nbstr/src/lib.rs.html#17-81' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>A lean <code>Cow&lt;&#39;static, str&gt;</code> that cannot be written to.</p>
 
 <p>Size is reduced by replacing <code>String</code> with <code>Box&lt;str&gt;</code><code>, which removes one</code>usize`, at the cost of some reallocation.</p>
@@ -55,7 +55,31 @@
 The length of the short str is then stored as a part of the tag/discriminant, which is why Nbstr is a struct and not an enum.
 The definition of &#39;short&#39; depends on architecture and features.</p>
 
-<p>There is four variants of Nbstr, see README for features.</p>
+<p>There are four variants of nbstr; See README for details.</p>
+
+<h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1>
+<pre class='rust rust-example-rendered'>
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>nbstr</span>;
+<span class='kw'>use</span> <span class='ident'>nbstr</span>::<span class='ident'>Nbstr</span>;
+
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Default</span>)]</span>
+<span class='kw'>struct</span> <span class='ident'>Container</span> {<span class='comment'>// &lt;- no lifetime</span>
+    <span class='ident'>list</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Nbstr</span><span class='op'>&gt;</span>
+}
+<span class='kw'>impl</span> <span class='ident'>Container</span> {
+    <span class='kw'>fn</span> <span class='ident'>append</span><span class='op'>&lt;</span><span class='ident'>S</span>:<span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>Nbstr</span><span class='op'>&gt;&gt;</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>,  <span class='ident'>s</span>: <span class='ident'>S</span>) {
+        <span class='self'>self</span>.<span class='ident'>list</span>.<span class='ident'>push</span>(<span class='ident'>s</span>.<span class='ident'>into</span>());
+    }
+}
+<span class='kw'>fn</span> <span class='ident'>main</span>() {
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>Container</span>::<span class='ident'>default</span>();
+    <span class='ident'>c</span>.<span class='ident'>append</span>(<span class='string'>&quot;foo&quot;</span>);<span class='comment'>// &amp;&#39;static str</span>
+    {   <span class='comment'>// &amp;str wouldn&#39;t work here since the strings goes out of scope before the Vec</span>
+        <span class='ident'>c</span>.<span class='ident'>append</span>(<span class='ident'>Nbstr</span>::<span class='ident'>from_str</span>(<span class='kw-2'>&amp;</span>(<span class='string'>&quot;bar&quot;</span>.<span class='ident'>to_string</span>())));<span class='comment'>// is short enough to avoid allocating,</span>
+        <span class='ident'>c</span>.<span class='ident'>append</span>(<span class='string'>&quot;baz&quot;</span>.<span class='ident'>to_string</span>());
+    }
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{:?}&quot;</span>, <span class='ident'>c</span>.<span class='ident'>list</span>);
+}</pre>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                     <tr class=' module-item'>

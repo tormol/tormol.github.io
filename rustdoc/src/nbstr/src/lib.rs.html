@@ -9,8 +9,8 @@
 
     <title>lib.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css">
 
     
     
@@ -107,6 +107,21 @@
 <span id="64">64</span>
 <span id="65">65</span>
 <span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
 </pre><pre class='rust '>
 <span class='comment'>/* Copyright 2016 Torbjørn Birch Moltu
  *
@@ -132,46 +147,61 @@
 <span class='doccomment'>//! The length of the short str is then stored as a part of the tag/discriminant, which is why Nbstr is a struct and not an enum.</span>
 <span class='doccomment'>//! The definition of &#39;short&#39; depends on architecture and features.</span>
 <span class='doccomment'>//!</span>
-<span class='doccomment'>//! There is four variants of Nbstr, see README for features.</span>
-
+<span class='doccomment'>//! There are four variants of nbstr; See README for details.</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! # Examples</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! ```rust</span>
+<span class='doccomment'>//! extern crate nbstr;</span>
+<span class='doccomment'>//! use nbstr::Nbstr;</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! #[derive(Default)]</span>
+<span class='doccomment'>//! struct Container {// &lt;- no lifetime</span>
+<span class='doccomment'>//!     list: Vec&lt;Nbstr&gt;</span>
+<span class='doccomment'>//! }</span>
+<span class='doccomment'>//! impl Container {</span>
+<span class='doccomment'>//!     fn append&lt;S:Into&lt;Nbstr&gt;&gt;(&amp;mut self,  s: S) {</span>
+<span class='doccomment'>//!         self.list.push(s.into());</span>
+<span class='doccomment'>//!     }</span>
+<span class='doccomment'>//! }</span>
+<span class='doccomment'>//! fn main() {</span>
+<span class='doccomment'>//!     let mut c = Container::default();</span>
+<span class='doccomment'>//!     c.append(&quot;foo&quot;);// &amp;&#39;static str</span>
+<span class='doccomment'>//!     {   // &amp;str wouldn&#39;t work here since the strings goes out of scope before the Vec</span>
+<span class='doccomment'>//!         c.append(Nbstr::from_str(&amp;(&quot;bar&quot;.to_string())));// is short enough to avoid allocating,</span>
+<span class='doccomment'>//!         c.append(&quot;baz&quot;.to_string());</span>
+<span class='doccomment'>//!     }</span>
+<span class='doccomment'>//!     println!(&quot;{:?}&quot;, c.list);</span>
+<span class='doccomment'>//! }</span>
+<span class='doccomment'>//! ```</span>
 
 <span class='comment'>// Overview:</span>
-<span class='comment'>// nbstr_shared.rs: code used for all variants of Nbstr.</span>
-<span class='comment'>// nbstr_*.rs: code specific to that variant / feature.</span>
-<span class='comment'>// utf8_char.rs: helper for converting from char.</span>
+<span class='comment'>// shared.rs: the public interface and code used in all variants.</span>
+<span class='comment'>// other: variant-specific code and implementation details.</span>
 
 
 <span class='comment'>// unstable features</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;unstable&quot;</span>, <span class='ident'>feature</span>(<span class='ident'>associated_consts</span>, <span class='ident'>unicode</span>,  <span class='ident'>nonzero</span>, <span class='ident'>unsafe_no_drop_flag</span>))]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;unstable&quot;</span>, <span class='ident'>feature</span>(<span class='ident'>associated_consts</span>,  <span class='ident'>nonzero</span>, <span class='ident'>unsafe_no_drop_flag</span>))]</span>
 
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>warn</span>(<span class='ident'>missing_docs</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;clippy&quot;</span>, <span class='ident'>feature</span>(<span class='ident'>plugin</span>))]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;clippy&quot;</span>, <span class='ident'>plugin</span>(<span class='ident'>clippy</span>))]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;clippy&quot;</span>, <span class='ident'>allow</span>(<span class='ident'>precedence</span>, <span class='ident'>identity_op</span>, <span class='ident'>len_without_is_empty</span>))]</span>
-<span class='comment'>// precedence: I prefer extra spaces around the central operator.</span>
-<span class='comment'>// identity_op: keep the flow in unrolled loops.</span>
-<span class='comment'>// len_without_is_empty: UTF8Char is never empty</span>
-<span class='comment'>// needless_return:</span>
-<span class='comment'>//     {let mut z = ...; z.modify(); z} looks unfinished.</span>
-<span class='comment'>//     If a function returns early, it `return`s late for consistency.</span>
-<span class='comment'>//     Not ignored because it has caught a few occurences that didn&#39;t match those.</span>
 
-<span class='kw'>mod</span> <span class='ident'>utf8_char</span>;
-<span class='kw'>mod</span> <span class='ident'>nbstr_shared</span>;
+<span class='kw'>mod</span> <span class='ident'>shared</span>;
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>not</span>(<span class='ident'>any</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;no_giants&quot;</span>, <span class='ident'>all</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;64as48bit_hack&quot;</span>, <span class='ident'>target_arch</span><span class='op'>=</span><span class='string'>&quot;x86_64&quot;</span>))))]</span>
-<span class='kw'>mod</span> <span class='ident'>nbstr_default</span>;
+<span class='kw'>mod</span> <span class='ident'>default</span>;
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>all</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;no_giants&quot;</span>, <span class='ident'>not</span>(<span class='ident'>all</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;64as48bit_hack&quot;</span>, <span class='ident'>target_arch</span><span class='op'>=</span><span class='string'>&quot;x86_64&quot;</span>))))]</span>
-<span class='kw'>mod</span> <span class='ident'>nbstr_no_giants</span>;
+<span class='kw'>mod</span> <span class='ident'>no_giants</span>;
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>all</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;64as48bit_hack&quot;</span>, <span class='ident'>target_arch</span><span class='op'>=</span><span class='string'>&quot;x86_64&quot;</span>))]</span>
-<span class='kw'>mod</span> <span class='ident'>nbstr_64as48bit_hack</span>;
+<span class='kw'>mod</span> <span class='ident'>x64as48bit_hack</span>;<span class='comment'>// cannot start with a number</span>
 <span class='kw'>mod</span> <span class='ident'>nbstr</span> {<span class='comment'>// rename variants</span>
     <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>not</span>(<span class='ident'>any</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;no_giants&quot;</span>, <span class='ident'>all</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;64as48bit_hack&quot;</span>, <span class='ident'>target_arch</span><span class='op'>=</span><span class='string'>&quot;x86_64&quot;</span>))))]</span>
-    <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>nbstr_default</span>::<span class='op'>*</span>;
+    <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>default</span>::<span class='op'>*</span>;
     <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>all</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;no_giants&quot;</span>, <span class='ident'>not</span>(<span class='ident'>all</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;64as48bit_hackt&quot;</span>, <span class='ident'>target_arch</span><span class='op'>=</span><span class='string'>&quot;x86_64&quot;</span>))))]</span>
-    <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>nbstr_no_giants</span>::<span class='op'>*</span>;
+    <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>no_giants</span>::<span class='op'>*</span>;
     <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>all</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;64as48bit_hack&quot;</span>, <span class='ident'>target_arch</span><span class='op'>=</span><span class='string'>&quot;x86_64&quot;</span>))]</span>
-    <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>nbstr_64as48bit_hack</span>::<span class='op'>*</span>;
+    <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>x64as48bit_hack</span>::<span class='op'>*</span>;
 }
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>nbstr</span>::<span class='ident'>Nbstr</span>;
 </pre>
@@ -227,13 +257,13 @@
     
 
     <script>
-        window.rootPath = "../../";
+        window.rootPath = "../../../";
         window.currentCrate = "nbstr";
         window.playgroundUrl = "";
     </script>
-    <script src="../../jquery.js"></script>
-    <script src="../../main.js"></script>
+    <script src="../../../jquery.js"></script>
+    <script src="../../../main.js"></script>
     
-    <script defer src="../../search-index.js"></script>
+    <script defer src="../../../search-index.js"></script>
 </body>
 </html>
