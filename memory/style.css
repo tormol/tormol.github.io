@@ -1,0 +1,95 @@
+html, body {
+	background-color: #fff;
+	color: #000;
+	margin: 0;
+	padding: 0;
+}
+#wrapper {
+	margin: 0 auto;
+	text-align: center;
+}
+#player1, #player2, #game {float: left;}
+main:after {
+	content:"";
+	display:table;
+	clear:both;
+}
+
+main {
+	background-color: #622;
+	color: #cc8;
+	border: 2em solid #ea6;
+	border-radius: 2em;
+	display: inline-block;
+	margin: 0.3em;
+}
+.img, .back {
+	width: 2.8em;
+	height: 2.8em;
+	display:block;
+	border: .1em solid #ddd;
+	padding: 0;
+}
+
+#game {line-height: 0;}
+#game .spot {
+	display: inline-block;
+	padding: 0;
+	width: 3em;
+	height: 3em;
+	margin: .2em;
+	float: left;
+	/* flip speed goes here */
+	transition: 1.7s;
+	transform-style: preserve-3d;
+	transform-origin: 3em;
+	position: relative;
+	/* Assign the perspective to enable 3d Transform */
+	perspective: 3em;
+}
+.spot * {
+	margin: 0;
+	backface-visibility: hidden;
+	position: absolute;
+}
+/* flip the pane when hovered */
+.spot.revealed {
+	transform: rotateX(180deg);
+}
+/* placed above img */
+#game .back {
+	z-index: 2;
+	transform: rotateX(0deg);
+}
+/* initially hidden pane */
+#game .img {transform: rotateX(180deg);}
+
+.player {
+	min-width: 3.5em;
+	min-height: 3.5em;
+	margin: .3em;
+}
+.player h2 {font-size: 1em;}
+.player .img {margin-top: -2.6em;}
+.player .img:first-of-type {margin-top: 0;}
+.player .img:hover {z-index: 11;}
+#singleplayer .img {
+	margin-top: 0;
+	margin-left: -2.6em;
+	float: left;
+}
+#singleplayer .img:first-of-type {margin-left: 0;}
+#singleplayer .img:nth-child(even) {margin-top: .2em;}
+#player1 .img:nth-child(even) {margin-left: .2em;}
+#player2 .img:nth-child(even) {margin-left: .2em;}
+
+#settings {	border: 0.1em dashed #333;}
+#settings>* {
+	display: block;
+	margin: auto;
+	text-align: center;
+}
+#play_again {font-size: 2em;}
+
+/*elements that start hidden*/
+.player, #play_again {display: none;}

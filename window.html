@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+ <meta charset="UTF-8">
+ <title>Tables</title>
+ <style type="text/css">
+  body>* {margin: auto;}
+  h1, a {
+   text-align: center;
+   display: block;
+  }
+  table {
+   background-repeat: repeat;
+   background-image: url(window.jpg);/*not my window*/
+   border: solid 1em #eee;
+   border-spacing: 0em;
+  }
+  td {
+   width: 4em;
+   height: 4em;
+   border: solid 0.3em rgba(200,200,200,0.8);
+   margin: 0;
+   padding: 0;
+  }
+  td:hover {opacity: 0;}
+  th {
+   background-color: #eb8;
+   border-style: none;
+  }
+  .white {background-color: rgba(255,255,255,0.1);}
+  .yellow {background-color: rgba(255,255,0,0.1);}
+  .red {background-color: rgba(255,0,0,0.1);}
+  .green {background-color: rgba(0,255,0,0.1);}
+  .blue {background-color: rgba(0,0,255,0.1);}
+ </style>
+</head>
+<body>
+ <h1>A HTML hand-in</h1>
+ <table>
+  <tr><th>window</th><th>with</th><th>colored</th><th>glass</th></tr>
+  <tr>
+   <td class="yellow" rowspan="2"></td>
+   <td class="white"></td>
+   <td class="red" colspan="2"></td>
+  </tr>
+  <tr>
+   <td class="green"></td>
+   <td class="white"></td>
+   <td class="green" rowspan="3"></td>
+  </tr>
+  <tr>
+   <td class="white"></td>
+   <td class="blue" colspan="2"></td>
+  </tr>
+  <tr>
+   <td class="yellow" colspan="2"></td>
+   <td class="white"></td>
+  </tr>
+  <tr>
+   <td class="blue"></td>
+   <td class="red" rowspan="2"></td>
+   <td class="yellow"></td>
+   <td class="white"></td>
+  </tr>
+  <tr>
+   <td class="white" rowspan="2"></td>
+   <td class="blue" colspan="2"></td>
+  </tr>
+  <tr>
+   <td class="green" colspan="3"></td>
+  </tr>
+ </table>
+ <a href="index.html">back to index</a>
+</body>
+</html>
