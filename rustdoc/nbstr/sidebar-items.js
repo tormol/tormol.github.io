@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Nbstr","A lean `Cow<'static, str>` that cannot be written to."]]});
