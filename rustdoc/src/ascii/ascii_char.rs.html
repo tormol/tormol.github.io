@@ -1123,7 +1123,7 @@
 
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>is_ascii</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='boolvalue'>true</span>
+        <span class='bool-val'>true</span>
     }
 
     <span class='kw'>fn</span> <span class='ident'>to_ascii_uppercase</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>AsciiChar</span> {
@@ -1241,17 +1241,17 @@
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>is_digit</span>() {
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='string'>&#39;0&#39;</span>.<span class='ident'>to_ascii_char</span>().<span class='ident'>unwrap</span>().<span class='ident'>is_digit</span>(), <span class='boolvalue'>true</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='string'>&#39;9&#39;</span>.<span class='ident'>to_ascii_char</span>().<span class='ident'>unwrap</span>().<span class='ident'>is_digit</span>(), <span class='boolvalue'>true</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='string'>&#39;/&#39;</span>.<span class='ident'>to_ascii_char</span>().<span class='ident'>unwrap</span>().<span class='ident'>is_digit</span>(), <span class='boolvalue'>false</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='string'>&#39;:&#39;</span>.<span class='ident'>to_ascii_char</span>().<span class='ident'>unwrap</span>().<span class='ident'>is_digit</span>(), <span class='boolvalue'>false</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='string'>&#39;0&#39;</span>.<span class='ident'>to_ascii_char</span>().<span class='ident'>unwrap</span>().<span class='ident'>is_digit</span>(), <span class='bool-val'>true</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='string'>&#39;9&#39;</span>.<span class='ident'>to_ascii_char</span>().<span class='ident'>unwrap</span>().<span class='ident'>is_digit</span>(), <span class='bool-val'>true</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='string'>&#39;/&#39;</span>.<span class='ident'>to_ascii_char</span>().<span class='ident'>unwrap</span>().<span class='ident'>is_digit</span>(), <span class='bool-val'>false</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='string'>&#39;:&#39;</span>.<span class='ident'>to_ascii_char</span>().<span class='ident'>unwrap</span>().<span class='ident'>is_digit</span>(), <span class='bool-val'>false</span>);
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>is_control</span>() {
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>AsciiChar</span>::<span class='ident'>US</span>.<span class='ident'>is_control</span>(), <span class='boolvalue'>true</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>AsciiChar</span>::<span class='ident'>DEL</span>.<span class='ident'>is_control</span>(), <span class='boolvalue'>true</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>AsciiChar</span>::<span class='ident'>Space</span>.<span class='ident'>is_control</span>(), <span class='boolvalue'>false</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>AsciiChar</span>::<span class='ident'>US</span>.<span class='ident'>is_control</span>(), <span class='bool-val'>true</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>AsciiChar</span>::<span class='ident'>DEL</span>.<span class='ident'>is_control</span>(), <span class='bool-val'>true</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>AsciiChar</span>::<span class='ident'>Space</span>.<span class='ident'>is_control</span>(), <span class='bool-val'>false</span>);
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>

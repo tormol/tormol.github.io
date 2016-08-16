@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["AsAsciiStrError","Error that is returned when a sequence of `u8` are not all ASCII."],["AsciiStr","AsciiStr represents a byte or string slice that only contains ASCII characters."]],"trait":[["AsAsciiStr","Convert slices of bytes to `AsciiStr`."],["AsMutAsciiStr","Convert mutable slices of bytes to `AsciiStr`."]]});

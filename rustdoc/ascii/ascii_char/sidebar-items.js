@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["AsciiChar","An ASCII character. It wraps a `u8`, with the highest bit always zero."]],"struct":[["ToAsciiCharError","Error returned by `ToAsciiChar`."]],"trait":[["ToAsciiChar","Convert `char`, `u8` and other character types to `AsciiChar`."]]});

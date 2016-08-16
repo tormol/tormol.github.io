@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Utf8Iterator","Read or iterate over the bytes in the UTF-8 representation of a codepoint."]]});

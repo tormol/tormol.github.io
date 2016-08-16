@@ -1,1 +1,0 @@
-initSidebarItems({"trait":[["CharExt","Extension trait for `char` that adds methods for converting to and from UTF-8 or UTF-16."],["U16UtfExt","Methods for working with `u16`s as UTF-16 units."],["U8UtfExt","Methods for working with `u8`s UTF-8."]]});

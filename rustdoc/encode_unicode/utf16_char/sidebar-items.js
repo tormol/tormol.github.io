@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Utf16Char","Store a `char` as UTF-16 so it can be borrowed as a slice"]]});

@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["FromStrError","Reasons why `Utf8Char::from_str()` failed."]],"struct":[["Utf8Char","Store a `char` as UTF-8 so it can be borrowed as a `str`"]]});
