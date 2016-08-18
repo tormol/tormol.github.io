@@ -4,11 +4,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for tormol's Rust crates.">
-    <meta name="keywords" content="rust, rustlang, rust-lang">
-    <title>tormol's crates - Rust</title>
-    <link rel="stylesheet" type="text/css" href="rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="main.css">
+    <meta name="description" content="API documentation for the Rust `guard` fn in crate `scopeguard`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, guard">
+
+    <title>scopeguard::guard - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../main.css">
+    
+
+    
+    
 </head>
 <body class="rustdoc">
     <!--[if lte IE 8]>
@@ -17,10 +23,14 @@
         things.
     </div>
     <![endif]-->
-    <nav class="sidebar" style="visibility: none; border-width: 0;		">
-        <p class='location'></p>
-        <script>window.sidebarCurrent = {name: '', ty: 'mod', relpath: ''};</script>
-	</nav>
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='index.html'>scopeguard</a></p><script>window.sidebarCurrent = {name: 'guard', ty: 'fn', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -31,28 +41,26 @@
             </div>
         </form>
     </nav>
-    <section id='main' class="content">
-		<h1 class='fqn'>
-			<span class='in-band'>
-				API documentation for my rust crates:
-			</span>
-		</h1>
-		<div class='docblock'>
-			<ul>
-				<li><a href="encode_unicode/index.html">encode_unicode</a></li>
-				<li><a href="map_in_place/index.html">map_in_place</a></li>
-				<li><a href="iterator_markers/index.html">iterator_markers</a></li>
-			</ul>
-			'crate' is rusts term for package / library.
-		</div>
-	</section>
+
+    <section id='main' class="content fn">
+<h1 class='fqn'><span class='in-band'>Function <a href='index.html'>scopeguard</a>::<wbr><a class='fn' href=''>guard</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-11' class='srclink' href='../src/scopeguard/lib.rs.html#38-42' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn guard&lt;T,&nbsp;F&gt;(v: T, dropfn: F) -&gt; <a class='struct' href='../scopeguard/struct.Guard.html' title='scopeguard::Guard'>Guard</a>&lt;T,&nbsp;F&gt; <span class='where'>where F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='core::ops::FnMut'>FnMut</a>(&amp;mut T)</span></pre><div class='docblock'><p>Create a new <code>Guard</code> owning <code>v</code> and with deferred closure <code>dropfn</code>.</p>
+</div></section>
     <section id='search' class="content hidden"></section>
+
     <section class="footer"></section>
+
     <aside id="help" class="hidden">
         <div>
             <h1 class="hidden">Help</h1>
+
             <div class="shortcuts">
                 <h2>Keyboard Shortcuts</h2>
+
                 <dl>
                     <dt>?</dt>
                     <dd>Show this help dialog</dd>
@@ -64,20 +72,26 @@
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
+
             <div class="infos">
                 <h2>Search Tricks</h2>
+
                 <p>
                     Prefix searches with a type followed by a colon (e.g.
                     <code>fn:</code>) to restrict the search to a given type.
                 </p>
+
                 <p>
                     Accepted types are: <code>fn</code>, <code>mod</code>,
                     <code>struct</code>, <code>enum</code>,
                     <code>trait</code>, <code>type</code>, <code>macro</code>,
                     and <code>const</code>.
                 </p>
+
                 <p>
                     Search functions by type signature (e.g.
                     <code>vec -> usize</code> or <code>* -> vec</code>)
@@ -85,13 +99,17 @@
             </div>
         </div>
     </aside>
+
+    
+
     <script>
-        window.rootPath = "";
+        window.rootPath = "../";
+        window.currentCrate = "scopeguard";
         window.playgroundUrl = "";
     </script>
-    <script src="jquery.js"></script>
-    <script src="main.js"></script>
-    <script defer src="search-index.js"></script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script defer src="../search-index.js"></script>
 </body>
 </html>
-
