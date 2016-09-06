@@ -56,7 +56,36 @@
 }</pre>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.map' class='method stab '><code>fn <a href='#tymethod.map' class='fnname'>map</a>&lt;B,&nbsp;F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='core::ops::FnMut'>FnMut</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;B&gt;</code></h3><h3 id='tymethod.map_in_place' class='method stab '><code>fn <a href='#tymethod.map_in_place' class='fnname'>map_in_place</a>&lt;B,&nbsp;F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='core::ops::FnMut'>FnMut</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;B&gt;</code></h3><h3 id='tymethod.filter_map' class='method stab '><code>fn <a href='#tymethod.filter_map' class='fnname'>filter_map</a>&lt;B,&nbsp;F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='core::ops::FnMut'>FnMut</a>(A) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;B&gt;&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;B&gt;</code></h3><h3 id='tymethod.filter_map_in_place' class='method stab '><code>fn <a href='#tymethod.filter_map_in_place' class='fnname'>filter_map_in_place</a>&lt;B,&nbsp;F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='core::ops::FnMut'>FnMut</a>(A) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;B&gt;&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;B&gt;</code></h3></div>
+        <h3 id='tymethod.map' class='method stab '><span id='map.v' class='invisible'><code>fn <a href='#tymethod.map' class='fnname'>map</a>&lt;B,&nbsp;F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='core::ops::FnMut'>FnMut</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;B&gt;</code></span></h3><div class='docblock'><p>Shorter than <code>.into_iter().map(f).collect::&lt;Vec&lt;_&gt;&gt;()</code>,
+and faster if the types have identical alignment and the size of <code>A</code> is
+divisible by the size of <code>B</code>: Then the allocation is reused.</p>
+
+<p>This function doesn&#39;t attempt to optimize cases
+where the size of <code>A</code> is a multiple of the size of <code>B</code>:
+I think <code>capacity</code> is rarely twice or more <code>size</code>, nevermind 3x or 4x.</p>
+</div><h3 id='tymethod.map_in_place' class='method stab '><span id='map_in_place.v' class='invisible'><code>fn <a href='#tymethod.map_in_place' class='fnname'>map_in_place</a>&lt;B,&nbsp;F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='core::ops::FnMut'>FnMut</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;B&gt;</code></span></h3><div class='docblock'><p>Reuse the memory owned by <code>self</code> when converting the elements
+to a different type.
+For this to be safe the types must have identical alignment and
+the size of <code>A</code> must be divisible by the size of <code>B</code>
+(<code>size_of::&lt;A&gt;() % size_of::&lt;B&gt;() == 0</code>).</p>
+
+<h1 id='panics' class='section-header'><a href='#panics'>Panics:</a></h1>
+<p>If the conditions above are not met.</p>
+</div><h3 id='tymethod.filter_map' class='method stab '><span id='filter_map.v' class='invisible'><code>fn <a href='#tymethod.filter_map' class='fnname'>filter_map</a>&lt;B,&nbsp;F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='core::ops::FnMut'>FnMut</a>(A) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;B&gt;&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;B&gt;</code></span></h3><div class='docblock'><p>Shorter than <code>.into_iter().filter_map(f).collect::&lt;Vec&lt;_&gt;&gt;()</code>,
+and faster if the types have identical alignment and the size of <code>A</code> is
+divisible by the size of <code>B</code>: Then the allocation is reused.</p>
+
+<p>This function doesn&#39;t (yet) attempt to optimize cases
+where the size of <code>A</code> is a multiple of the size of <code>B</code>.</p>
+</div><h3 id='tymethod.filter_map_in_place' class='method stab '><span id='filter_map_in_place.v' class='invisible'><code>fn <a href='#tymethod.filter_map_in_place' class='fnname'>filter_map_in_place</a>&lt;B,&nbsp;F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='core::ops::FnMut'>FnMut</a>(A) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;B&gt;&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;B&gt;</code></span></h3><div class='docblock'><p>Reuse the memory owned by <code>self</code> when filtering and converting
+the elements to a different type.
+For this to be safe the types must have identical alignment and
+the size of <code>A</code> must be divisible by the size of <code>B</code>
+(`size_of::<A>() % size_of::<B>() == 0).</p>
+
+<h1 id='panics-1' class='section-header'><a href='#panics-1'>Panics:</a></h1>
+<p>If the conditions above are not met.</p>
+</div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
     <li><code>impl&lt;A&gt; MapVecInPlace&lt;A&gt; for <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;A&gt;</code></li>

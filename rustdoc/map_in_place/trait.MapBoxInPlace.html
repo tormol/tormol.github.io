@@ -54,7 +54,23 @@
 }</pre>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.map' class='method stab '><code>fn <a href='#tymethod.map' class='fnname'>map</a>&lt;B,&nbsp;F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html' title='core::ops::FnOnce'>FnOnce</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;B&gt;</code></h3><h3 id='tymethod.map_in_place' class='method stab '><code>fn <a href='#tymethod.map_in_place' class='fnname'>map_in_place</a>&lt;B,&nbsp;F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html' title='core::ops::FnOnce'>FnOnce</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;B&gt;</code></h3></div>
+        <h3 id='tymethod.map' class='method stab '><span id='map.v' class='invisible'><code>fn <a href='#tymethod.map' class='fnname'>map</a>&lt;B,&nbsp;F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html' title='core::ops::FnOnce'>FnOnce</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;B&gt;</code></span></h3><div class='docblock'><p>Replace the value with one that might have a different type.</p>
+
+<p>If the types have identical size and alignment
+the heap allocation will be reused.
+If the closure then unwinds, the owned memory (but not the value,
+which the closure consumed) is leaked.
+This might change in the future.</p>
+</div><h3 id='tymethod.map_in_place' class='method stab '><span id='map_in_place.v' class='invisible'><code>fn <a href='#tymethod.map_in_place' class='fnname'>map_in_place</a>&lt;B,&nbsp;F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html' title='core::ops::FnOnce'>FnOnce</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;B&gt;</code></span></h3><div class='docblock'><p>Replace the value in the box with one that might be of another type
+as long the new type has identical size and alignment with the old one.</p>
+
+<p>If the closure unwinds, the owned memory (but not the value,
+which the closure consumed) is leaked.
+This might change in the future.</p>
+
+<h1 id='panics' class='section-header'><a href='#panics'>Panics:</a></h1>
+<p>If the new type doesn&#39;t have the same size and alignment.</p>
+</div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
     <li><code>impl&lt;A&gt; MapBoxInPlace&lt;A&gt; for <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;A&gt;</code></li>

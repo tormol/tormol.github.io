@@ -257,22 +257,78 @@
 <span id="213">213</span>
 <span id="214">214</span>
 <span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
 </pre><pre class='rust '>
 <span class='doccomment'>/*!
-Reuse alloations when mapping the elements of a `Vec`, `Box&lt;[T]&gt;` or `Box&lt;T&gt;`
-if possible.
+Reuse allocations when converting the elements of a vector, boxed slice or box
+to a compatible type.
 
-To map in place the types must have identical alignment and:
-
-* * for boxes and boxed slices the sizes must be equal,
-* * for vectors the size of *in* must be a multiple of the *out* type.
-    (so *out* cannot be bigger than *in*)
-
-The `..._in_place()` methods will panic if not possible,
+The `*_in_place()` methods will panic if the types are not compatible,
 while the others will fall back to iterating and collecting.
 
 I might add methods to the traits without a default impl or a major version bump;
 implement them for other types at your own risk.
+I might also change the panic messages.
 
 # Examples:
 
@@ -292,12 +348,101 @@ fn main() {
 */</span>
 
 
-
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>scopeguard</span>;
 <span class='kw'>use</span> <span class='ident'>scopeguard</span>::<span class='ident'>guard</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::{<span class='ident'>mem</span>, <span class='ident'>ptr</span>};
 
-<span class='kw'>fn</span> <span class='ident'>handle_panic_of</span><span class='op'>&lt;</span><span class='ident'>R</span>, <span class='ident'>F</span>:<span class='ident'>FnOnce</span>()<span class='op'>-&gt;</span><span class='ident'>R</span>, <span class='ident'>D</span>:<span class='ident'>FnMut</span>()<span class='op'>&gt;</span>
+
+<span class='comment'>// Error messages used by {map,retain}_in_place().</span>
+<span class='kw'>static</span> <span class='ident'>ERR_ZERO_SIZED</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;Cannot reuse memory for zero-sized types&quot;</span>;
+<span class='kw'>static</span> <span class='ident'>ERR_ALIGNMENT</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;`A` and `B` have different alignment&quot;</span>;
+<span class='kw'>static</span> <span class='ident'>ERR_NEED_EXACT_SIZE</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;`A` and `B` have different sizes&quot;</span>;
+<span class='kw'>static</span> <span class='ident'>ERR_NEED_DIVISIBLE_SIZE</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span>
+     <span class='op'>=</span> <span class='string'>&quot;The size of `A` is not equal to or a multiple of the size of `B`&quot;</span>;
+
+
+
+<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>MapBoxInPlace</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> {
+    <span class='doccomment'>/// Replace the value with one that might have a different type.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// If the types have identical size and alignment</span>
+    <span class='doccomment'>/// the heap allocation will be reused.</span>
+    <span class='doccomment'>/// If the closure then unwinds, the owned memory (but not the value,</span>
+    <span class='doccomment'>/// which the closure consumed) is leaked.</span>
+    <span class='doccomment'>/// This might change in the future.</span>
+    <span class='kw'>fn</span> <span class='ident'>map</span><span class='op'>&lt;</span><span class='ident'>B</span>,<span class='ident'>F</span>:<span class='ident'>FnOnce</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='ident'>B</span><span class='op'>&gt;</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span>;
+
+    <span class='doccomment'>/// Replace the value in the box with one that might be of another type</span>
+    <span class='doccomment'>/// as long the new type has identical size and alignment with the old one.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// If the closure unwinds, the owned memory (but not the value,</span>
+    <span class='doccomment'>/// which the closure consumed) is leaked.</span>
+    <span class='doccomment'>/// This might change in the future.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Panics:</span>
+    <span class='doccomment'>/// If the new type doesn&#39;t have the same size and alignment.</span>
+    <span class='kw'>fn</span> <span class='ident'>map_in_place</span><span class='op'>&lt;</span><span class='ident'>B</span>,<span class='ident'>F</span>:<span class='ident'>FnOnce</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='ident'>B</span><span class='op'>&gt;</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span>;
+}
+
+<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>MapSliceInPlace</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> {
+    <span class='doccomment'>/// Map the elements as in an iterator, but reuse the allocation if</span>
+    <span class='doccomment'>/// the types have identical size and alignment.</span>
+    <span class='kw'>fn</span> <span class='ident'>map</span><span class='op'>&lt;</span><span class='ident'>B</span>,<span class='ident'>F</span>:<span class='ident'>FnMut</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='ident'>B</span><span class='op'>&gt;</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span>[<span class='ident'>B</span>]<span class='op'>&gt;</span>;
+
+    <span class='doccomment'>/// Map the elements as in an iterator, but reuse the allocation.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Panics:</span>
+    <span class='doccomment'>/// If the old and new types doesn&#39;t have identical size and alignment.</span>
+    <span class='kw'>fn</span> <span class='ident'>map_in_place</span><span class='op'>&lt;</span><span class='ident'>B</span>,<span class='ident'>F</span>:<span class='ident'>FnMut</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='ident'>B</span><span class='op'>&gt;</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span>[<span class='ident'>B</span>]<span class='op'>&gt;</span>;
+}
+
+<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>MapVecInPlace</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> {
+    <span class='doccomment'>/// Shorter than `.into_iter().map(f).collect::&lt;Vec&lt;_&gt;&gt;()`,</span>
+    <span class='doccomment'>/// and faster if the types have identical alignment and the size of `A` is</span>
+    <span class='doccomment'>/// divisible by the size of `B`: Then the allocation is reused.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// This function doesn&#39;t attempt to optimize cases</span>
+    <span class='doccomment'>/// where the size of `A` is a multiple of the size of `B`:</span>
+    <span class='doccomment'>/// I think `capacity` is rarely twice or more `size`, nevermind 3x or 4x.</span>
+    <span class='kw'>fn</span> <span class='ident'>map</span><span class='op'>&lt;</span><span class='ident'>B</span>,<span class='ident'>F</span>:<span class='ident'>FnMut</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='ident'>B</span><span class='op'>&gt;</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span>;
+
+    <span class='doccomment'>/// Reuse the memory owned by `self` when converting the elements</span>
+    <span class='doccomment'>/// to a different type.</span>
+    <span class='doccomment'>/// For this to be safe the types must have identical alignment and</span>
+    <span class='doccomment'>/// the size of `A` must be divisible by the size of `B`</span>
+    <span class='doccomment'>/// (`size_of::&lt;A&gt;() % size_of::&lt;B&gt;() == 0`).</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Panics:</span>
+    <span class='doccomment'>/// If the conditions above are not met.</span>
+    <span class='kw'>fn</span> <span class='ident'>map_in_place</span><span class='op'>&lt;</span><span class='ident'>B</span>,<span class='ident'>F</span>:<span class='ident'>FnMut</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='ident'>B</span><span class='op'>&gt;</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span>;
+
+    <span class='comment'>// Vec uses retain and not filter,</span>
+    <span class='comment'>// but retain_map reads like keep, then replace, which doesn&#39;t make sense.</span>
+
+    <span class='doccomment'>/// Shorter than `.into_iter().filter_map(f).collect::&lt;Vec&lt;_&gt;&gt;()`,</span>
+    <span class='doccomment'>/// and faster if the types have identical alignment and the size of `A` is</span>
+    <span class='doccomment'>/// divisible by the size of `B`: Then the allocation is reused.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// This function doesn&#39;t (yet) attempt to optimize cases</span>
+    <span class='doccomment'>/// where the size of `A` is a multiple of the size of `B`.</span>
+    <span class='kw'>fn</span> <span class='ident'>filter_map</span><span class='op'>&lt;</span><span class='ident'>B</span>,<span class='ident'>F</span>:<span class='ident'>FnMut</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;&gt;</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span>;
+
+    <span class='doccomment'>/// Reuse the memory owned by `self` when filtering and converting</span>
+    <span class='doccomment'>/// the elements to a different type.</span>
+    <span class='doccomment'>/// For this to be safe the types must have identical alignment and</span>
+    <span class='doccomment'>/// the size of `A` must be divisible by the size of `B`</span>
+    <span class='doccomment'>/// (`size_of::&lt;A&gt;() % size_of::&lt;B&gt;() == 0).</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Panics:</span>
+    <span class='doccomment'>/// If the conditions above are not met.</span>
+    <span class='kw'>fn</span> <span class='ident'>filter_map_in_place</span><span class='op'>&lt;</span><span class='ident'>B</span>,<span class='ident'>F</span>:<span class='ident'>FnMut</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;&gt;</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span>;
+}
+
+<span class='comment'>// VecDeque lacks a from_raw_parts and a way to get/set start and end index.</span>
+
+
+
+<span class='kw'>fn</span> <span class='ident'>handle_unwind_of</span><span class='op'>&lt;</span><span class='ident'>R</span>, <span class='ident'>F</span>:<span class='ident'>FnOnce</span>()<span class='op'>-&gt;</span><span class='ident'>R</span>, <span class='ident'>D</span>:<span class='ident'>FnMut</span>()<span class='op'>&gt;</span>
 (<span class='ident'>might_panic</span>: <span class='ident'>F</span>,  <span class='kw-2'>mut</span> <span class='ident'>cleanup</span>: <span class='ident'>D</span>) <span class='op'>-&gt;</span> <span class='ident'>R</span> {
     <span class='kw'>let</span> <span class='ident'>guard</span> <span class='op'>=</span> <span class='ident'>guard</span>((), <span class='op'>|</span>_<span class='op'>|</span> <span class='ident'>cleanup</span>() );
     <span class='kw'>let</span> <span class='ident'>r</span> <span class='op'>=</span> <span class='ident'>might_panic</span>();
@@ -325,10 +470,10 @@ fn main() {
 }}
 <span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>panicy</span> {(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>a</span>:<span class='ident'>ty</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>b</span>:<span class='ident'>ty</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>rel</span>:<span class='ident'>expr</span><span class='op'>=&gt;</span><span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>ok</span>:<span class='ident'>expr</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>notrel</span>:<span class='ident'>expr</span>) <span class='op'>=&gt;</span> {
     <span class='macro'>sizes</span><span class='macro'>!</span>{<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>a</span>,<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>b</span>,
-        <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;The optimization doesn&#39;t make sense fore zero-sized types&quot;</span>),
-        <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;`A` and `B` have different alignment&quot;</span>),
+        <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>ERR_ZERO_SIZED</span>),
+        <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>ERR_ALIGNMENT</span>),
         <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>rel</span> <span class='op'>=&gt;</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>ok</span>,
-        <span class='macro'>panic</span><span class='macro'>!</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>notrel</span>),
+        <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>notrel</span>),
     }
 }}
 <span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>fallback</span> {(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>a</span>:<span class='ident'>ty</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>b</span>:<span class='ident'>ty</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>rel</span>:<span class='ident'>expr</span><span class='op'>=&gt;</span><span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>ok</span>:<span class='ident'>expr</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>fallback</span>:<span class='ident'>expr</span>) <span class='op'>=&gt;</span> {
@@ -342,10 +487,6 @@ fn main() {
 
 
 
-<span class='comment'>// VecDeque lacks a from_raw_parts and a way to get/set start and end index.</span>
-
-
-
 <span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>filter_map_vec</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>B</span>, <span class='ident'>F</span>:<span class='ident'>FnMut</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;&gt;</span>
 (<span class='kw-2'>mut</span> <span class='ident'>vec</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>,  <span class='kw-2'>mut</span> <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span> {
     <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='ident'>vec</span>.<span class='ident'>len</span>();
@@ -356,7 +497,7 @@ fn main() {
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>wrote</span> <span class='op'>=</span> <span class='number'>0</span>;
     <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>len</span> {
         <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>ptr</span>::<span class='ident'>read</span>(<span class='ident'>read</span>.<span class='ident'>offset</span>(<span class='ident'>i</span> <span class='kw'>as</span> <span class='ident'>isize</span>));
-        <span class='kw'>let</span> <span class='ident'>result</span> <span class='op'>=</span> <span class='ident'>handle_panic_of</span>(<span class='op'>||</span> <span class='ident'>f</span>(<span class='ident'>a</span>), <span class='op'>||</span> {
+        <span class='kw'>let</span> <span class='ident'>result</span> <span class='op'>=</span> <span class='ident'>handle_unwind_of</span>(<span class='op'>||</span> <span class='ident'>f</span>(<span class='ident'>a</span>), <span class='op'>||</span> {
             <span class='kw'>for</span> <span class='ident'>ii</span> <span class='kw'>in</span> <span class='ident'>i</span><span class='op'>+</span><span class='number'>1</span>..<span class='ident'>len</span> {
                 <span class='ident'>ptr</span>::<span class='ident'>drop_in_place</span>(<span class='ident'>read</span>.<span class='ident'>offset</span>(<span class='ident'>ii</span> <span class='kw'>as</span> <span class='ident'>isize</span>));
             }
@@ -373,14 +514,6 @@ fn main() {
 (<span class='ident'>vec</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>,  <span class='kw-2'>mut</span> <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span> {
     <span class='ident'>filter_map_vec</span>(<span class='ident'>vec</span>, <span class='op'>|</span><span class='ident'>a</span><span class='op'>|</span> <span class='prelude-val'>Some</span>(<span class='ident'>f</span>(<span class='ident'>a</span>)) )
 }
-<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>MapVecInPlace</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> {
-    <span class='kw'>fn</span> <span class='ident'>map</span><span class='op'>&lt;</span><span class='ident'>B</span>,<span class='ident'>F</span>:<span class='ident'>FnMut</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='ident'>B</span><span class='op'>&gt;</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span>;
-    <span class='kw'>fn</span> <span class='ident'>map_in_place</span><span class='op'>&lt;</span><span class='ident'>B</span>,<span class='ident'>F</span>:<span class='ident'>FnMut</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='ident'>B</span><span class='op'>&gt;</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span>;
-    <span class='comment'>// Vec uses retain and not filter,</span>
-    <span class='comment'>// but retain_map reads like keep, then replace, which doesn&#39;t make sense.</span>
-    <span class='kw'>fn</span> <span class='ident'>filter_map</span><span class='op'>&lt;</span><span class='ident'>B</span>,<span class='ident'>F</span>:<span class='ident'>FnMut</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;&gt;</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span>;
-    <span class='kw'>fn</span> <span class='ident'>filter_map_in_place</span><span class='op'>&lt;</span><span class='ident'>B</span>,<span class='ident'>F</span>:<span class='ident'>FnMut</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;&gt;</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span>;
-}
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> <span class='ident'>MapVecInPlace</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> {
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>map</span><span class='op'>&lt;</span><span class='ident'>B</span>,<span class='ident'>F</span>:<span class='ident'>FnMut</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='ident'>B</span><span class='op'>&gt;</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span> {
@@ -393,7 +526,7 @@ fn main() {
     <span class='kw'>fn</span> <span class='ident'>map_in_place</span><span class='op'>&lt;</span><span class='ident'>B</span>,<span class='ident'>F</span>:<span class='ident'>FnMut</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='ident'>B</span><span class='op'>&gt;</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span> {
         <span class='macro'>panicy</span><span class='macro'>!</span>{<span class='ident'>A</span>,<span class='ident'>B</span>,
             <span class='op'>|</span><span class='ident'>a</span>,<span class='ident'>b</span><span class='op'>|</span> <span class='ident'>a</span><span class='op'>%</span><span class='ident'>b</span><span class='op'>==</span><span class='number'>0</span> <span class='op'>=&gt;</span> <span class='ident'>map_vec</span>(<span class='self'>self</span>, <span class='ident'>f</span>),
-            <span class='string'>&quot;The size of `A` is not a multiple of `B`&quot;</span>
+            <span class='ident'>ERR_NEED_DIVISIBLE_SIZE</span>
         }
     }
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
@@ -407,7 +540,7 @@ fn main() {
     <span class='kw'>fn</span> <span class='ident'>filter_map_in_place</span><span class='op'>&lt;</span><span class='ident'>B</span>,<span class='ident'>F</span>:<span class='ident'>FnMut</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;&gt;</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span> {
         <span class='macro'>panicy</span><span class='macro'>!</span>{<span class='ident'>A</span>,<span class='ident'>B</span>,
             <span class='op'>|</span><span class='ident'>a</span>,<span class='ident'>b</span><span class='op'>|</span> <span class='ident'>a</span><span class='op'>%</span><span class='ident'>b</span><span class='op'>==</span><span class='number'>0</span> <span class='op'>=&gt;</span> <span class='ident'>filter_map_vec</span>(<span class='self'>self</span>, <span class='ident'>f</span>),
-            <span class='string'>&quot;The size of `A` is not a multiple of `B`&quot;</span>
+            <span class='ident'>ERR_NEED_DIVISIBLE_SIZE</span>
         }
     }
 }
@@ -417,10 +550,6 @@ fn main() {
 <span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>map_slice</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>B</span>, <span class='ident'>F</span>:<span class='ident'>FnMut</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='ident'>B</span><span class='op'>&gt;</span>
 (<span class='ident'>boxed</span>: <span class='ident'>Box</span><span class='op'>&lt;</span>[<span class='ident'>A</span>]<span class='op'>&gt;</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span>[<span class='ident'>B</span>]<span class='op'>&gt;</span> {
     <span class='ident'>map_vec</span>(<span class='ident'>boxed</span>.<span class='ident'>into_vec</span>(), <span class='ident'>f</span>).<span class='ident'>into_boxed_slice</span>()
-}
-<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>MapSliceInPlace</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> {
-    <span class='kw'>fn</span> <span class='ident'>map</span><span class='op'>&lt;</span><span class='ident'>B</span>,<span class='ident'>F</span>:<span class='ident'>FnMut</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='ident'>B</span><span class='op'>&gt;</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span>[<span class='ident'>B</span>]<span class='op'>&gt;</span>;
-    <span class='kw'>fn</span> <span class='ident'>map_in_place</span><span class='op'>&lt;</span><span class='ident'>B</span>,<span class='ident'>F</span>:<span class='ident'>FnMut</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='ident'>B</span><span class='op'>&gt;</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span>[<span class='ident'>B</span>]<span class='op'>&gt;</span>;
 }
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> <span class='ident'>MapSliceInPlace</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Box</span><span class='op'>&lt;</span>[<span class='ident'>A</span>]<span class='op'>&gt;</span> {
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
@@ -434,7 +563,7 @@ fn main() {
     <span class='kw'>fn</span> <span class='ident'>map_in_place</span><span class='op'>&lt;</span><span class='ident'>B</span>,<span class='ident'>F</span>:<span class='ident'>FnMut</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='ident'>B</span><span class='op'>&gt;</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span>[<span class='ident'>B</span>]<span class='op'>&gt;</span> {
         <span class='macro'>panicy</span><span class='macro'>!</span>{<span class='ident'>A</span>,<span class='ident'>B</span>,
             <span class='op'>|</span><span class='ident'>a</span>,<span class='ident'>b</span><span class='op'>|</span> <span class='ident'>a</span><span class='op'>==</span><span class='ident'>b</span> <span class='op'>=&gt;</span> <span class='ident'>map_slice</span>(<span class='self'>self</span>, <span class='ident'>f</span>),
-            <span class='string'>&quot;`A` and `B` have different size&quot;</span>
+            <span class='ident'>ERR_NEED_EXACT_SIZE</span>
         }
     }
 }
@@ -445,17 +574,10 @@ fn main() {
 (<span class='ident'>boxed</span>: <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span> {
     <span class='kw'>let</span> <span class='ident'>aptr</span> <span class='op'>=</span> <span class='ident'>Box</span>::<span class='ident'>into_raw</span>(<span class='ident'>boxed</span>);
     <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>ptr</span>::<span class='ident'>read</span>(<span class='ident'>aptr</span>);
-    <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>handle_panic_of</span>(<span class='op'>||</span> <span class='ident'>f</span>(<span class='ident'>a</span>), <span class='op'>||</span> {
-        <span class='comment'>// Currently OK.</span>
-        <span class='ident'>mem</span>::<span class='ident'>drop</span>(<span class='ident'>Vec</span>::<span class='ident'>from_raw_parts</span>(<span class='ident'>aptr</span>, <span class='number'>0</span>, <span class='number'>1</span>));
-    });
+    <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>f</span>(<span class='ident'>a</span>);<span class='comment'>// If it unwinds, the memory is leaked.</span>
     <span class='kw'>let</span> <span class='ident'>bptr</span> <span class='op'>=</span> <span class='ident'>aptr</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>B</span>;
     <span class='ident'>ptr</span>::<span class='ident'>write</span>(<span class='ident'>bptr</span>, <span class='ident'>b</span>);
     <span class='ident'>Box</span>::<span class='ident'>from_raw</span>(<span class='ident'>bptr</span>)
-}
-<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>MapBoxInPlace</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> {
-    <span class='kw'>fn</span> <span class='ident'>map</span><span class='op'>&lt;</span><span class='ident'>B</span>,<span class='ident'>F</span>:<span class='ident'>FnOnce</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='ident'>B</span><span class='op'>&gt;</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span>;
-    <span class='kw'>fn</span> <span class='ident'>map_in_place</span><span class='op'>&lt;</span><span class='ident'>B</span>,<span class='ident'>F</span>:<span class='ident'>FnOnce</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='ident'>B</span><span class='op'>&gt;</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span>;
 }
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> <span class='ident'>MapBoxInPlace</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> {
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
@@ -469,7 +591,7 @@ fn main() {
     <span class='kw'>fn</span> <span class='ident'>map_in_place</span><span class='op'>&lt;</span><span class='ident'>B</span>,<span class='ident'>M</span>:<span class='ident'>FnOnce</span>(<span class='ident'>A</span>)<span class='op'>-&gt;</span><span class='ident'>B</span><span class='op'>&gt;</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>M</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span> {
         <span class='macro'>panicy</span><span class='macro'>!</span>{<span class='ident'>A</span>,<span class='ident'>B</span>,
             <span class='op'>|</span><span class='ident'>a</span>,<span class='ident'>b</span><span class='op'>|</span> <span class='ident'>a</span><span class='op'>==</span><span class='ident'>b</span> <span class='op'>=&gt;</span> <span class='ident'>map_box</span>(<span class='self'>self</span>, <span class='ident'>f</span>),
-            <span class='string'>&quot;`A` and `B` have different size&quot;</span>
+            <span class='ident'>ERR_NEED_EXACT_SIZE</span>
         }
     }
 }

@@ -208,7 +208,29 @@
 <span id="164">164</span>
 <span id="165">165</span>
 <span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
 </pre><pre class='rust '>
+<span class='comment'>// Copyright 2016 Torbjørn Birch Moltu.</span>
+<span class='comment'>//</span>
+<span class='comment'>// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
+<span class='comment'>// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
+<span class='comment'>// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
+<span class='comment'>// option. This file may not be copied, modified, or distributed</span>
+<span class='comment'>// except according to those terms.</span>
+
+<span class='doccomment'>//! Extra marker traits for iterators.</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! # Feature flags:</span>
+<span class='doccomment'>//! * **unstable**: Implement for `Range` and `RangeInclusive`.</span>
+<span class='doccomment'>//! * **no_std**: Use `#[no_std]` and don&#39;t implement for the map and set iterators in std.</span>
+
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;unstable&quot;</span>, <span class='ident'>feature</span>(<span class='ident'>inclusive_range</span>, <span class='ident'>step_trait</span>))]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;no_std&quot;</span>, <span class='ident'>no_std</span>)]</span>
 
@@ -226,7 +248,7 @@
 <span class='doccomment'>/// It does not guarantee uniqueness, but equal items must come straight after each other.</span>
 <span class='doccomment'>/// Use `I: UniqueIterator+AscendingIterator` if you need both.</span>
 <span class='doccomment'>///</span>
-<span class='doccomment'>/// The trait is unsafe so consumers can rely on it.</span>
+<span class='doccomment'>/// The trait is unsafe so consumers can rely on it.  </span>
 <span class='doccomment'>/// It is a logic error to implement both `AscendingIterator` and `DescendingIterator` for the same type.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// # Examples:</span>
@@ -240,7 +262,7 @@
 <span class='doccomment'>/// It does not guarantee uniqueness, but equal items must come straight after each other.</span>
 <span class='doccomment'>/// Use `I: UniqueIterator+DescendingIterator` if you need both.</span>
 <span class='doccomment'>///</span>
-<span class='doccomment'>/// The trait is unsafe so consumers can rely on it.</span>
+<span class='doccomment'>/// The trait is unsafe so consumers can rely on it.  </span>
 <span class='doccomment'>/// It is a logic error to implement both `AscendingIterator` and `DescendingIterator` for the same type.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// # Examples:</span>
@@ -268,12 +290,6 @@
     <span class='kw'>use</span> <span class='kw'>super</span>::{<span class='ident'>UniqueIterator</span>,<span class='ident'>AscendingIterator</span>};
     <span class='kw'>use</span> <span class='ident'>core</span>::<span class='ident'>ops</span>::{<span class='ident'>Range</span>,<span class='ident'>RangeInclusive</span>, <span class='ident'>Add</span>};
     <span class='kw'>use</span> <span class='ident'>core</span>::<span class='ident'>iter</span>::<span class='ident'>Step</span>;<span class='comment'>// is unstable and must be specified.</span>
-
-    <span class='comment'>// I wish this worked: unsafe impl&lt;T&gt; UniqueIterator for Range&lt;T&gt; where Range&lt;T&gt;: Iterator&lt;Item=T&gt; {}</span>
-    <span class='comment'>// Error if clause is never satisfied, because coherence doesn&#39;t allow this:</span>
-    <span class='comment'>//     pub struct S(usize);</span>
-    <span class='comment'>//     impl Iterator for core::ops::RangeTo&lt;S&gt;</span>
-    <span class='comment'>//         {type Item=usize; fn next(&amp;self) -&gt; Option&lt;usize&gt;{None}}</span>
 
     <span class='doccomment'>/// Requires the feature `unstable`.</span>
     <span class='kw'>unsafe</span> <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>:<span class='ident'>PartialEq</span><span class='op'>+</span><span class='ident'>Step</span><span class='op'>&gt;</span> <span class='ident'>UniqueIterator</span> <span class='kw'>for</span> <span class='ident'>Range</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='kw'>for</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span>: <span class='ident'>Add</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;</span> {}
@@ -326,7 +342,7 @@
     <span class='kw'>unsafe</span> <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>:<span class='ident'>Ord</span><span class='op'>&gt;</span> <span class='ident'>AscendingIterator</span> <span class='kw'>for</span> <span class='ident'>btree_set</span>::<span class='ident'>IntoIter</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {}
     <span class='kw'>unsafe</span> <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>:<span class='ident'>Ord</span><span class='op'>&gt;</span> <span class='ident'>AscendingIterator</span> <span class='kw'>for</span> <span class='ident'>btree_set</span>::<span class='ident'>Iter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>,<span class='ident'>T</span><span class='op'>&gt;</span> {}
     <span class='kw'>unsafe</span> <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>:<span class='ident'>Ord</span><span class='op'>&gt;</span> <span class='ident'>AscendingIterator</span> <span class='kw'>for</span> <span class='ident'>btree_set</span>::<span class='ident'>Intersection</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>,<span class='ident'>T</span><span class='op'>&gt;</span> {}
-    <span class='comment'>// Are the others sortedd?</span>
+    <span class='comment'>// Are the others sorted?</span>
 }
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>not</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;no_std&quot;</span>))]</span>
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>collections</span>::<span class='op'>*</span>;
