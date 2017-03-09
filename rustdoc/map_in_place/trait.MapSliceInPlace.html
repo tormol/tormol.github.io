@@ -9,6 +9,7 @@
 
     <title>map_in_place::MapSliceInPlace - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../normalize.css">
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
     
@@ -47,23 +48,23 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-23' class='srclink' href='../src/map_in_place/lib.rs.html#66-76' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../src/map_in_place/lib.rs.html#66-76' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait MapSliceInPlace&lt;A&gt; {
-    fn <a href='#tymethod.map' class='fnname'>map</a>&lt;B,&nbsp;F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='core::ops::FnMut'>FnMut</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>[</a>B<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>&gt;;
-    fn <a href='#tymethod.map_in_place' class='fnname'>map_in_place</a>&lt;B,&nbsp;F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='core::ops::FnMut'>FnMut</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>[</a>B<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>&gt;;
+    fn <a href='#tymethod.map' class='fnname'>map</a>&lt;B, F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='trait core::ops::FnMut'>FnMut</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='struct alloc::boxed::Box'>Box</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>[</a>B<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>&gt;;
+    fn <a href='#tymethod.map_in_place' class='fnname'>map_in_place</a>&lt;B, F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='trait core::ops::FnMut'>FnMut</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='struct alloc::boxed::Box'>Box</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>[</a>B<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>&gt;;
 }</pre>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.map' class='method stab '><span id='map.v' class='invisible'><code>fn <a href='#tymethod.map' class='fnname'>map</a>&lt;B,&nbsp;F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='core::ops::FnMut'>FnMut</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>[</a>B<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>&gt;</code></span></h3><div class='docblock'><p>Map the elements as in an iterator, but reuse the allocation if
+        <h3 id='tymethod.map' class='method'><span id='map.v' class='invisible'><code>fn <a href='#tymethod.map' class='fnname'>map</a>&lt;B, F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='trait core::ops::FnMut'>FnMut</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='struct alloc::boxed::Box'>Box</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>[</a>B<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>&gt;</code></span></h3><div class='docblock'><p>Map the elements as in an iterator, but reuse the allocation if
 the types have identical size and alignment.</p>
-</div><h3 id='tymethod.map_in_place' class='method stab '><span id='map_in_place.v' class='invisible'><code>fn <a href='#tymethod.map_in_place' class='fnname'>map_in_place</a>&lt;B,&nbsp;F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='core::ops::FnMut'>FnMut</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>[</a>B<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>&gt;</code></span></h3><div class='docblock'><p>Map the elements as in an iterator, but reuse the allocation.</p>
+</div><h3 id='tymethod.map_in_place' class='method'><span id='map_in_place.v' class='invisible'><code>fn <a href='#tymethod.map_in_place' class='fnname'>map_in_place</a>&lt;B, F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='trait core::ops::FnMut'>FnMut</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='struct alloc::boxed::Box'>Box</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>[</a>B<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>&gt;</code></span></h3><div class='docblock'><p>Map the elements as in an iterator, but reuse the allocation.</p>
 
 <h1 id='panics' class='section-header'><a href='#panics'>Panics:</a></h1>
 <p>If the old and new types doesn&#39;t have identical size and alignment.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
-    <li><code>impl&lt;A&gt; MapSliceInPlace&lt;A&gt; for <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>[</a>A<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>&gt;</code></li>
+    <li><code>impl&lt;A&gt; MapSliceInPlace&lt;A&gt; for <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='struct alloc::boxed::Box'>Box</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>[</a>A<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>&gt;</code></li>
 </ul><script type="text/javascript" async
                          src="../implementors/map_in_place/trait.MapSliceInPlace.js">
                  </script></section>
@@ -122,11 +123,9 @@ the types have identical size and alignment.</p>
     <script>
         window.rootPath = "../";
         window.currentCrate = "map_in_place";
-        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
     <script defer src="../search-index.js"></script>
 </body>
 </html>

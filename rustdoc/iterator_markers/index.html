@@ -9,6 +9,7 @@
 
     <title>iterator_markers - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../normalize.css">
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
     
@@ -47,20 +48,20 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-0' class='srclink' href='../src/iterator_markers/lib.rs.html#9-174' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../src/iterator_markers/lib.rs.html#9-174' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Extra marker traits for iterators.</p>
 
 <h1 id='feature-flags' class='section-header'><a href='#feature-flags'>Feature flags:</a></h1>
 <ul>
 <li><strong>unstable</strong>: Implement for <code>Range</code> and <code>RangeInclusive</code>.</li>
-<li><strong>no_std</strong>: Use <code>#[no_std]</code> and don&#39;t implement for the map and set iterators in std.</li>
+<li>(opt-out) <strong>std</strong>: Implement for the map and set iterators in std and don&#39;t set <code>#[no_std]</code>.</li>
 </ul>
 </div><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
 <table>
                        <tr class=' module-item'>
                            <td><a class='trait' href='trait.AscendingIterator.html'
-                                  title='iterator_markers::AscendingIterator'>AscendingIterator</a></td>
-                           <td class='docblock short'>
+                                  title='trait iterator_markers::AscendingIterator'>AscendingIterator</a></td>
+                           <td class='docblock-short'>
                                 <p>Marker trait for iterators that return items in a sorted ascending order.
 It does not guarantee uniqueness, but equal items must come straight after each other.
 Use <code>I: UniqueIterator+AscendingIterator</code> if you need both.</p>
@@ -68,8 +69,8 @@ Use <code>I: UniqueIterator+AscendingIterator</code> if you need both.</p>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='trait' href='trait.DescendingIterator.html'
-                                  title='iterator_markers::DescendingIterator'>DescendingIterator</a></td>
-                           <td class='docblock short'>
+                                  title='trait iterator_markers::DescendingIterator'>DescendingIterator</a></td>
+                           <td class='docblock-short'>
                                 <p>Marker trait for iterators that return items in a sorted desscending order.
 It does not guarantee uniqueness, but equal items must come straight after each other.
 Use <code>I: UniqueIterator+DescendingIterator</code> if you need both.</p>
@@ -77,8 +78,8 @@ Use <code>I: UniqueIterator+DescendingIterator</code> if you need both.</p>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='trait' href='trait.UniqueIterator.html'
-                                  title='iterator_markers::UniqueIterator'>UniqueIterator</a></td>
-                           <td class='docblock short'>
+                                  title='trait iterator_markers::UniqueIterator'>UniqueIterator</a></td>
+                           <td class='docblock-short'>
                                 <p>Marker trait for iterators that will never return two equal items, like a set.</p>
                            </td>
                        </tr></table></section>
@@ -137,11 +138,9 @@ Use <code>I: UniqueIterator+DescendingIterator</code> if you need both.</p>
     <script>
         window.rootPath = "../";
         window.currentCrate = "iterator_markers";
-        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
     <script defer src="../search-index.js"></script>
 </body>
 </html>

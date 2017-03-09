@@ -9,6 +9,7 @@
 
     <title>ascii::AsAsciiStr - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../normalize.css">
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
     
@@ -47,23 +48,23 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-696' class='srclink' href='../src/ascii/ascii_str.rs.html#366-371' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../src/ascii/ascii_str.rs.html#533-538' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait AsAsciiStr {
-    unsafe fn <a href='#tymethod.as_ascii_str_unchecked' class='fnname'>as_ascii_str_unchecked</a>(&amp;self) -&gt; &amp;<a class='struct' href='../ascii/struct.AsciiStr.html' title='ascii::AsciiStr'>AsciiStr</a>;
-    fn <a href='#tymethod.as_ascii_str' class='fnname'>as_ascii_str</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;&amp;<a class='struct' href='../ascii/struct.AsciiStr.html' title='ascii::AsciiStr'>AsciiStr</a>,&nbsp;<a class='struct' href='../ascii/struct.AsAsciiStrError.html' title='ascii::AsAsciiStrError'>AsAsciiStrError</a>&gt;;
+    unsafe fn <a href='#tymethod.as_ascii_str_unchecked' class='fnname'>as_ascii_str_unchecked</a>(&amp;self) -&gt; &amp;<a class='struct' href='../ascii/struct.AsciiStr.html' title='struct ascii::AsciiStr'>AsciiStr</a>;
+    fn <a href='#tymethod.as_ascii_str' class='fnname'>as_ascii_str</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='enum core::result::Result'>Result</a>&lt;&amp;<a class='struct' href='../ascii/struct.AsciiStr.html' title='struct ascii::AsciiStr'>AsciiStr</a>, <a class='struct' href='../ascii/struct.AsAsciiStrError.html' title='struct ascii::AsAsciiStrError'>AsAsciiStrError</a>&gt;;
 }</pre><div class='docblock'><p>Convert slices of bytes to <code>AsciiStr</code>.</p>
 </div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.as_ascii_str_unchecked' class='method stab '><span id='as_ascii_str_unchecked.v' class='invisible'><code>unsafe fn <a href='#tymethod.as_ascii_str_unchecked' class='fnname'>as_ascii_str_unchecked</a>(&amp;self) -&gt; &amp;<a class='struct' href='../ascii/struct.AsciiStr.html' title='ascii::AsciiStr'>AsciiStr</a></code></span></h3><div class='docblock'><p>Convert to an ASCII slice without checking for non-ASCII characters.</p>
-</div><h3 id='tymethod.as_ascii_str' class='method stab '><span id='as_ascii_str.v' class='invisible'><code>fn <a href='#tymethod.as_ascii_str' class='fnname'>as_ascii_str</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;&amp;<a class='struct' href='../ascii/struct.AsciiStr.html' title='ascii::AsciiStr'>AsciiStr</a>,&nbsp;<a class='struct' href='../ascii/struct.AsAsciiStrError.html' title='ascii::AsAsciiStrError'>AsAsciiStrError</a>&gt;</code></span></h3><div class='docblock'><p>Convert to an ASCII slice.</p>
+        <h3 id='tymethod.as_ascii_str_unchecked' class='method'><span id='as_ascii_str_unchecked.v' class='invisible'><code>unsafe fn <a href='#tymethod.as_ascii_str_unchecked' class='fnname'>as_ascii_str_unchecked</a>(&amp;self) -&gt; &amp;<a class='struct' href='../ascii/struct.AsciiStr.html' title='struct ascii::AsciiStr'>AsciiStr</a></code></span></h3><div class='docblock'><p>Convert to an ASCII slice without checking for non-ASCII characters.</p>
+</div><h3 id='tymethod.as_ascii_str' class='method'><span id='as_ascii_str.v' class='invisible'><code>fn <a href='#tymethod.as_ascii_str' class='fnname'>as_ascii_str</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='enum core::result::Result'>Result</a>&lt;&amp;<a class='struct' href='../ascii/struct.AsciiStr.html' title='struct ascii::AsciiStr'>AsciiStr</a>, <a class='struct' href='../ascii/struct.AsAsciiStrError.html' title='struct ascii::AsAsciiStrError'>AsAsciiStrError</a>&gt;</code></span></h3><div class='docblock'><p>Convert to an ASCII slice.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
-    <li><code>impl AsAsciiStr for <a class='struct' href='../ascii/struct.AsciiStr.html' title='ascii::AsciiStr'>AsciiStr</a></code></li>
-<li><code>impl AsAsciiStr for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>[</a><a class='enum' href='../ascii/enum.AsciiChar.html' title='ascii::AsciiChar'>AsciiChar</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a></code></li>
-<li><code>impl AsAsciiStr for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a></code></li>
-<li><code>impl AsAsciiStr for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a></code></li>
+    <li><code>impl AsAsciiStr for <a class='struct' href='../ascii/struct.AsciiStr.html' title='struct ascii::AsciiStr'>AsciiStr</a></code></li>
+<li><code>impl AsAsciiStr for [<a class='enum' href='../ascii/enum.AsciiChar.html' title='enum ascii::AsciiChar'>AsciiChar</a>]</code></li>
+<li><code>impl AsAsciiStr for [u8]</code></li>
+<li><code>impl AsAsciiStr for str</code></li>
 </ul><script type="text/javascript" async
                          src="../implementors/ascii/trait.AsAsciiStr.js">
                  </script></section>
@@ -122,11 +123,9 @@
     <script>
         window.rootPath = "../";
         window.currentCrate = "ascii";
-        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
     <script defer src="../search-index.js"></script>
 </body>
 </html>
