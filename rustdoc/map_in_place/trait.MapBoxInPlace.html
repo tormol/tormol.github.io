@@ -44,25 +44,25 @@
     </nav>
 
     <section id='main' class="content trait">
-<h1 class='fqn'><span class='in-band'>Trait <a href='index.html'>map_in_place</a>::<wbr><a class='trait' href=''>MapBoxInPlace</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Trait <a href='index.html'>map_in_place</a>::<wbr><a class="trait" href=''>MapBoxInPlace</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
                </span><a class='srclink' href='../src/map_in_place/lib.rs.html#44-64' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait MapBoxInPlace&lt;A&gt; {
-    fn <a href='#tymethod.map' class='fnname'>map</a>&lt;B, F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html' title='trait core::ops::FnOnce'>FnOnce</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='struct alloc::boxed::Box'>Box</a>&lt;B&gt;;
-    fn <a href='#tymethod.map_in_place' class='fnname'>map_in_place</a>&lt;B, F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html' title='trait core::ops::FnOnce'>FnOnce</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='struct alloc::boxed::Box'>Box</a>&lt;B&gt;;
+    fn <a href='#tymethod.map' class='fnname'>map</a>&lt;B, F:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html" title="trait core::ops::FnOnce">FnOnce</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;B&gt;;
+    fn <a href='#tymethod.map_in_place' class='fnname'>map_in_place</a>&lt;B, F:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html" title="trait core::ops::FnOnce">FnOnce</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;B&gt;;
 }</pre>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.map' class='method'><span id='map.v' class='invisible'><code>fn <a href='#tymethod.map' class='fnname'>map</a>&lt;B, F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html' title='trait core::ops::FnOnce'>FnOnce</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='struct alloc::boxed::Box'>Box</a>&lt;B&gt;</code></span></h3><div class='docblock'><p>Replace the value with one that might have a different type.</p>
+        <h3 id='tymethod.map' class='method'><span id='map.v' class='invisible'><code>fn <a href='#tymethod.map' class='fnname'>map</a>&lt;B, F:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html" title="trait core::ops::FnOnce">FnOnce</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;B&gt;</code></span></h3><div class='docblock'><p>Replace the value with one that might have a different type.</p>
 
 <p>If the types have identical size and alignment
 the heap allocation will be reused.
 If the closure then unwinds, the owned memory (but not the value,
 which the closure consumed) is leaked.
 This might change in the future.</p>
-</div><h3 id='tymethod.map_in_place' class='method'><span id='map_in_place.v' class='invisible'><code>fn <a href='#tymethod.map_in_place' class='fnname'>map_in_place</a>&lt;B, F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html' title='trait core::ops::FnOnce'>FnOnce</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='struct alloc::boxed::Box'>Box</a>&lt;B&gt;</code></span></h3><div class='docblock'><p>Replace the value in the box with one that might be of another type
+</div><h3 id='tymethod.map_in_place' class='method'><span id='map_in_place.v' class='invisible'><code>fn <a href='#tymethod.map_in_place' class='fnname'>map_in_place</a>&lt;B, F:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html" title="trait core::ops::FnOnce">FnOnce</a>(A) -&gt; B&gt;(self, f: F) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;B&gt;</code></span></h3><div class='docblock'><p>Replace the value in the box with one that might be of another type
 as long the new type has identical size and alignment with the old one.</p>
 
 <p>If the closure unwinds, the owned memory (but not the value,
@@ -74,7 +74,7 @@ This might change in the future.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
-    <li><code>impl&lt;A&gt; MapBoxInPlace&lt;A&gt; for <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='struct alloc::boxed::Box'>Box</a>&lt;A&gt;</code></li>
+    <li><code>impl&lt;A&gt; MapBoxInPlace&lt;A&gt; for <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;A&gt;</code></li>
 </ul><script type="text/javascript" async
                          src="../implementors/map_in_place/trait.MapBoxInPlace.js">
                  </script></section>
