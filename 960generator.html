@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>960-chess generator</title>
+  <meta name="keywords" content="960chess,960-chess,Fischer-chess,Fischer-sjakk"/>
+  <meta name="viewport" content="width=device-vidth, user-scalable=yes"/>
+ </head>
+ <body>
+  <header>
+   <h1>960-chess generator</h1>
+   <noscript>(requires javascript)</noscript>
+  </header>
+  <main>
+   <table id="board">
+    <caption>chess board</caption>
+    <tr><th>&nbsp;</th><th>a</th><th>b</th><th>c</th><th>d</th><th>e</th><th>f</th><th>g</th><th>h</th><th>&nbsp;</th></tr>
+    <tr id="black_home"><th>8</th><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><th>8</th></tr>
+    <tr><th>7</th><td>&#9823;</td><td>&#9823;</td><td>&#9823;</td><td>&#9823;</td><td>&#9823;</td><td>&#9823;</td><td>&#9823;</td><td>&#9823;</td><th>7</th></tr>
+    <tr><th>6</th><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><th>6</th></tr>
+    <tr><th>5</th><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><th>5</th></tr>
+    <tr><th>4</th><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><th>4</th></tr>
+    <tr><th>3</th><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><th>3</th></tr>
+    <tr><th>2</th><td>&#9817;</td><td>&#9817;</td><td>&#9817;</td><td>&#9817;</td><td>&#9817;</td><td>&#9817;</td><td>&#9817;</td><td>&#9817;</td><th>2</th></tr>
+    <tr id="white_home"><th>1</th><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><th>1</th></tr>
+    <tr><th>&nbsp;</th><th>a</th><th>b</th><th>c</th><th>d</th><th>e</th><th>f</th><th>g</th><th>h</th><th>&nbsp;</th></tr>
+   </table>
+   <p>In letters: <span id="textual"></span></p>
+  </main>
+  <script>
+// @ license magnet:?xt=urn:btih:8e4f440f4c65981c5bf93c76d35135ba5064d8b7&dn=apache-2.0.txt Apache-2.0
+// Copyright 2018 Torbjørn Birch Moltu
+var symbols = {
+    "K": {black:"&#9818;", white:"&#9812;"},
+    "Q": {black:"&#9819;", white:"&#9813;"},
+    "R": {black:"&#9820;", white:"&#9814;"},
+    "B": {black:"&#9821;", white:"&#9815;"},
+    "N": {black:"&#9822;", white:"&#9816;"},
+    ".": {black:"&#9823;", white:"&#9817;"}
+};
+
+function randomId() {
+    return Math.floor(Math.random()*960)+1;
+}
+function rowFromId(id) {
+	id--;
+	var row = [null,null,null,null,null,null,null,null];
+	function place(row, nth, piece) {
+	    for (var i=0; i<=nth; i++) {
+	        if (row[i] !== null) {
+	           nth++;
+	        }
+	    }
+	    row[nth] = piece;
+	}
+	// bishops
+	row[(id%4)*2] = "B";
+	id = Math.floor(id/4);
+	row[1+(id%4)*2] = "B";
+	id = Math.floor(id/4);
+	// queen
+	place(row, id%6, "Q");
+	id = Math.floor(id/6);
+	// knights
+	var knight_b = [1,2,3,4, 2,3,4, 3,4, 4];
+	var knight_a = [0,0,0,0, 1,1,1, 2,2, 3];
+	place(row, knight_b[id], "N");
+	place(row, knight_a[id], "N");
+	// rooks and the king between them
+	place(row, 2, "R");
+	place(row, 1, "K");
+	place(row, 0, "R");
+	return row;
+}
+function renderRow(row) {
+	var black_home = document.getElementById("black_home");
+	var white_home = document.getElementById("white_home");
+	var black_cells = black_home.getElementsByTagName("td");
+	var white_cells = white_home.getElementsByTagName("td");
+	for (var i=0; i<8; i++) {
+		var piece = symbols[row[i]];
+		black_cells[i].innerHTML = piece["black"];
+		white_cells[i].innerHTML = piece["white"];
+	}
+
+	var text_element = document.getElementById("textual");
+	var textual = row.toString().replace(" ","");
+	text_element.textContent = textual;
+}
+
+renderRow(rowFromId(randomId()));
+  </script>
+ </body>
+</html>
