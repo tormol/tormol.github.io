@@ -4,9 +4,12 @@
   <meta charset="utf-8">
   <title>Torbjørns ønskeliste</title>
   <style type="text/css">
+html, body {
+    min-height: 100%;
+}
 body {
-    padding: 0.5em 0em;
-    background-color: #f4f7eb;
+    padding: 1em 0 0 0;
+    background-color: #110095;
     color: #000;
 }
 #center {
@@ -26,7 +29,7 @@ main {
 }
 li {
     padding: 0.1em 0.3em;
-    margin: 0.1em 0.1em;
+    margin: 0.2em 2.1em 0.2em 0.1em;
     background-color: #fff8f8;
     list-style-type: square;
     color: #224;
@@ -35,10 +38,30 @@ li::marker {
     content: "🎁︎ ";
     color: #ff0;
 }
+li img {
+    max-height: 2em;
+    vertical-align: text-top;
+    float: right;
+}
+li::after {
+    clear: both;
+    content: "";
+    display: block;
+}
+li:hover img {
+    max-height: 10em;
+    display: block;
+    margin: 0 auto;
+}
 footer {
-    margin-top: 2em;
+    margin: 2em auto;
+    max-width: 26em;
     text-align: center;
-    color: #080;
+    background-color: #fffafa;
+    color: #bb4;
+    font-weight: bold;
+    border-radius: 1.4em;
+    padding: 1em 2em;
 }
    </style>
   </head>
@@ -51,16 +74,19 @@ footer {
     <ul>
      <!--<li>bukse til hverdags og jobb-bruk</li>-->
      <li>målebeger med kant-lokk (til å piske krem)</li>
-     <li>sitronpresse i metall</li>
-     <li>lue lignende den svart/blå/hvite jeg hadde</li>
+     <li>sitronpresse, helst i metall</li>
+     <li>
+      lue lignende den svart/blå/hvite jeg hadde:
+      <a href="lue.jpg" title="klikk for større"><img src="lue.jpg" alt="meg med lue"></a>
+     </li>
      <li>digitalt klassekampen-abbonement (for 1-2 måneder)</li>
      <li>verandabord</li>
      <!--<li>svart belte (læret er sprukket på et jeg har er, så trenger bare lær-delen)</li>-->
      <li>grytelokk 10cm diameter (hvis det finnes)</li>
-     <li>Strømmforsyning til PC: 7-800W, Antec, bequiet eller annet merke av kvalitet</li>
+     <li>Strømmforsyning til PC: 7-800W, Antec, seasonic, bequiet eller annet merke av kvalitet</li>
     </ul>
    </main>
-   <footer>Sist oppdatert 9/12/2022</footer>
+   <footer>Sist oppdatert 11/12/2022</footer>
   </div>
  </body>
 </html>
