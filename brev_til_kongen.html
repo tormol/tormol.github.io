@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="no">
+ <head>
+  <meta charset="utf-8">
+  <title>Spill brev til kongen kortspill</title>
+  <style type="text/css">
+body {
+    /*part of making footer stick to bottom*/
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    /*make background colors of header and main fill the whole page*/
+    min-width: 100%;
+    margin: 0;
+    padding: 0;
+
+    /*set defaults*/
+    background-color: #fff;
+    color: #000;
+
+    /*almost all text on this page will be centered*/
+    text-align: center;
+}
+header {
+    width: 100%;
+    background-color: #8b7443;
+    color: #4d450b;
+}
+header>*, main>* {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 30em;
+    min-width: 10em;
+}
+header h1 {
+    margin-top: 0.3em;
+    margin-bottom: 0.3em;
+    font-size: 150%;
+}
+header p {
+    margin-top: 0.1em;
+    margin-bottom: 0.4em;
+}
+main {
+    /*part of making footer stick to bottom*/
+    flex: 1;
+
+    background-color: #444;
+    padding: 1em;
+}
+footer {
+    width: 100%;
+}
+
+#table {
+    margin-top: 0;
+    height: 21em;
+    background-color: #0a0;
+    border-color: #2c3318;
+    border-style: solid;
+    border-width: 0.3em;
+    border-radius: 0.75em;
+    justify-content: space-between;
+}
+.player {
+    background-color: #00a600;
+    border-color: #444;
+    border-style: solid;
+    border-width: 0.02em;
+    border-radius: 0.2em;
+    margin: 0.5em;
+}
+.player>p {
+    font-size: 50%;
+    color: #444;
+    margin: 0;
+    padding: 0.1em 0.3em 0.05em 0.3em;
+}
+.card {
+    height: 5em;
+    width: 3em;
+    margin: 0.2em;
+}
+
+#table, .player, .opponent {
+    display: flex;
+    flex-direction: column;
+}
+#table>* {
+    margin-left: auto;
+    margin-right: auto;
+}
+#opponents, #center, .hand {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+.hand {
+    width: 7em;
+}
+#center {
+    width: 7.5em;
+    justify-content: space-around;
+}
+#opponents {
+    overflow-x: scroll;
+    max-width: 80vw;
+}
+
+.card {
+    border-radius: 0.5em;
+    /*use border as the edge around the center until I make images*/
+    /*to make this work nicely, make the border not increase the size of the element*/
+    box-sizing: border-box;
+    border-width: 0.2em;
+    border-style: solid;
+    padding: 0.18em;
+
+    border-color: #eec;
+    background-color: #ee7;
+    color: #c44;
+
+    /*vertically justify the text*/
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.no-card {
+    border-width: 0;
+    background-color: #080;
+}
+.hidden-card {
+    border-width: 0.15em;
+    background-color: #a04b19;
+}
+.card>p {
+    margin: 0;
+}
+.card>p:last-child {
+    rotate: 180deg;
+}
+.pick-one .card:hover {
+    filter: brightness(150%);
+    cursor: pointer;
+}
+  </style>
+ </head>
+ <body>
+  <header>
+   <h1>Brev til kongen kortspill</h1>
+   <p>(Mot én datastyrt motspiller)</p>
+  </header>
+  <main>
+   <div id="table">
+    <div id="opponents">
+     <div id="opponent1" class="player">
+      <p>Motstander</p>
+      <div id="opponent1-cards" class="hand">
+       <div id="opponent1-card1" class="card hidden-card"></div>
+      </div>
+     </div>
+    </div>
+    <div id="center">
+     <div id="undealt-cards" class="card no-card"></div>
+     <div id="played-cards" class="card card9"><p>9</p><p>🛡️</p><p>9</p></div>
+    </div>
+    <div id="you" class="player">
+     <p>Deg</p>
+     <div id="your-cards" class="hand pick-one">
+      <div id="card1" class="card card7"><p>7</p><p>👀</p><p>7</p></div>
+      <div id="card2" class="card cardk"><p>K</p><p>💔<!--☠️--></p><p>K</p></div>
+     </div>
+    </div>
+   </main>
+  </div>
+  <footer>
+   <p>Laget av Torbjørn</p>
+   <p><a href="https://kortregler.no/brev-til-kongen" title="Les regler på kortregler.no">Regler</a></p>
+  </footer>
+ </body>
+</html>
