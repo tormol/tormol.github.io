@@ -79,6 +79,12 @@ footer {
     margin: 0;
     padding: 0.1em 0.3em 0.05em 0.3em;
 }
+.player.lost {
+    filter: brightness(75%);
+}
+.player.immune {
+    filter: brightness(90%);
+}
 .card {
     height: 5em;
     width: 3em;
@@ -140,6 +146,9 @@ footer {
     border-width: 0.15em;
     background-color: #a04b19;
 }
+.highlighted-card {
+    filter: brightness(120%);
+}
 
 #removed-card {
     rotate: 90deg;
@@ -180,8 +189,12 @@ footer {
    <div id="table">
     <div id="opponents">
      <div id="opponent1" class="player">
-      <p>Motstander</p>
+      <p>Motstander 1</p>
       <div id="opponent1-cards" class="hand"></div>
+     </div>
+     <div id="opponent2" class="player">
+      <p>Motstander 2</p>
+      <div id="opponent2-cards" class="hand"></div>
      </div>
     </div>
     <div id="message">
