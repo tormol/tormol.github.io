@@ -18,8 +18,8 @@ body {
 }
 header {
     width: 100%;
-    background-color: #8b7443;
-    color: #4d450b;
+    background-color: #082;
+    color: #3e3c25;
 }
 header>*, main>* {
     margin-left: auto;
@@ -40,7 +40,6 @@ main {
     /*part of making footer stick to bottom*/
     flex: 1;
 
-    background-color: #444;
     padding: 1em;
 }
 footer {
@@ -51,7 +50,7 @@ footer {
     margin-top: 0;
     min-height: 25em;
     background-color: #0a0;
-    border-color: #2c3318;
+    border-color: #262;
     border-style: solid;
     border-width: 0.3em;
     border-radius: 0.75em;
@@ -60,6 +59,17 @@ footer {
     box-sizing: border-box;
     /*the reference for a position:absolute element must have position:relative*/
     position: relative;
+}
+@media (max-width: 30rem) {
+    main {
+        padding-left: 0;
+        padding-right: 0;
+    }
+    #table {
+        border-radius: 0;
+        border-width: 0.2em 0 0.2em 0;
+        width: 100%;
+    }
 }
 .player {
     background-color: #00a600;
