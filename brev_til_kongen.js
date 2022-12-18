@@ -1,246 +1,7 @@
 // @license magnet:?xt=urn:btih:0b31508aeb0634b347b8270c7bee4d411b5d4109&dn=agpl-3.0.txt AGPL-3.0
-class Card {
-    constructor(name, value, icon, description) {
-        this.name = name
-        this.value = value
-        this.icon = icon
-        this.description = description
-    }
-}
-
-const CARD_BY_VALUE = {
-    13: new Card('K', 13, '💔'/*☠️*/, "Man taper hvis man spiller den eller må kaste den"),
-    12: new Card('Q', 12, ' ', 'Har ingen effekt, men må spilles hvis man har knekt eller 10'),
-    11: new Card('J', 11, '🔀', 'Velg en spiller å bytte gjenverende kort med'),
-    10: new Card('10', 10, '🔃', 'Velg en spiller som må trekke nytt kort'),
-    9: new Card('9', 9, '🛡️', 'Du er imun - ingen kan velge deg inntil det er din tur igjen'),
-    8: new Card('8', 8, '⚔️', 'Duell - Velg en spiller å sammenligne kort med, den som har lavest taper, har dere likt forsetter dere'),
-    7: new Card('7', 7, '👀', 'Velg en spiller å se kortet til'),
-    6: new Card('6', 6, '❓', 'Velg en spiller å gjette kortet til - gjetter du riktig taper han, men du kan ikke gjette 6')
-}
-
-function shuffled_deck() {
-    let deck = []
-    const number_of_cards = {13:1, 12:1, 11:1, 10:2, 9:2, 8:2, 7:2, 6:5}
-    for (const value in number_of_cards) {
-        for (let i=0; i<number_of_cards[value]; i++) {
-            deck.push(CARD_BY_VALUE[value])
-        }
-    }
-
-    // shuffle, from https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
-    let currentIndex = deck.length
-    let randomIndex
-    // While there remain elements to shuffle.
-    while (currentIndex != 0) {
-        // Pick a remaining element.
-        randomIndex = Math.floor(Math.random() * currentIndex)
-        currentIndex--
-        // And swap it with the current element.
-        [deck[currentIndex], deck[randomIndex]] = [deck[randomIndex], deck[currentIndex]]
-    }
-
-    return deck
-}
-
-function create_card(parent_id) {
-    let card = document.createElement('div')
-    card.classList.add('card')
-    document.getElementById(parent_id).appendChild(card)
-    return card
-}
-
-function remove_all_children(node) {
-    while (node.firstChild) {
-        node.removeChild(node.firstChild)
-    }
-}
 
 function set_message(text) {
     document.getElementById('message').textContent = text
-}
-
-/// A viewed card.
-/// It is used both for cards in the hand of a player, and for the cards on the table.
-class CardSlot {
-    /// To create a new element, pass create_card(parent_id) as node
-    constructor(node, default_hidden, card) {
-        if (!node) {
-            throw Error("card element doesn't exist")
-        }
-        this._node = node
-        this._card = card || null
-        this.default_hidden = default_hidden
-        this.render_default()
-    }
-    get node() {
-        return this._node
-    }
-    has_card() {
-        return !(this._card === null)
-    }
-    get card() {
-        return this._card
-    }
-    /// Change which value to show
-    /// Only used for card slots on the table
-    set_card(card) {
-        this._card = card
-        this.render_default()
-    }
-    /// Make a card slot on the table empty.
-    /// This removes the card but not the node
-    no_card() {
-        this._card = null
-        remove_all_children(this.node)
-        this.node.classList.remove('hidden-card')
-        this.node.classList.add('no-card')
-    }
-    /// Removes the card node from its parent
-    /// Returns the card.
-    /// The CardSlot should not be used after this
-    delete() {
-        if (this._node && this._node.parentNode) {
-            this._node.parentNode.removeChild(this._node)
-        }
-        return this._card
-    }
-
-    hide() {
-        this.hidden = true
-        if (this.has_card()) {
-            this.node.classList.remove('no-card')
-            this.node.classList.add('hidden-card')
-            remove_all_children(this.node)
-        }
-    }
-    show() {
-        this.hidden = false
-        if (this.has_card()) {
-            this.node.classList.remove('no-card')
-            this.node.classList.remove('hidden-card')
-            remove_all_children(this.node)
-            this.node.appendChild(document.createElement('p')).textContent = this._card.name
-            this.node.appendChild(document.createElement('p')).textContent = this._card.icon
-            this.node.appendChild(document.createElement('p')).textContent = this._card.name
-        }
-    }
-    highlight() {
-        this._highlight = true
-        this.node.classList.add('highlighted-card')
-    }
-    /// Remove highlight and reset to default show/hide.
-    render_default() {
-        this._highlight = false
-        this.node.classList.remove('highlighted-card')
-
-        if (!this.has_card()) {
-            this.no_card()
-            this.hidden = this.default_hidden
-        } else if (this.default_hidden) {
-            this.hide()
-        } else {
-            this.show()
-        }
-    }
-}
-
-class Deck {
-    constructor(node) {
-        this.slot = new CardSlot(node, true)
-        this.cards = []
-    }
-    set_cards(cards) {
-        if (cards.length == 0 && this.cards.length > 0) {
-            this.slot.no_card()
-        } else if (this.cards.length == 0 && cards.length > 0) {
-            // make it display hidden
-            this.slot.set_card(cards[0])
-        }
-        this.cards = cards
-    }
-    get number_of_cards() {
-        return this.cards.length
-    }
-    draw_card() {
-        if (this.cards.length == 0) {
-            console.log('deck is empty')
-            return null
-        }
-
-        const card = this.cards.pop()
-        //console.log('cards in deck after drawing one: ' + this.cards.length)
-        if (this.cards.length == 0) {
-            this.slot.no_card()
-        }
-        return card
-    }
-}
-
-class Player {
-    constructor(name, hand_id, hidden_cards, view_others_card, render_feedback, select_card_to_play, select_player) {
-        this.name = name
-        this.cards = []
-        this.hand_id = hand_id
-        this.hand_node = document.getElementById(hand_id)
-        this.hidden_cards = hidden_cards
-        this.view_others_card = view_others_card
-        this.render_feedback = render_feedback
-        this.select_card_to_play = select_card_to_play
-        this.select_player = select_player
-        this.set_immune(false)
-        this.set_lost(false)
-        this.remove_all_cards()
-    }
-    add_card(card) {
-        this.cards.push(new CardSlot(create_card(this.hand_id), this.hidden_cards, card))
-    }
-    remove_card(index) {
-        const slot = this.cards[index]
-        slot.delete()
-        this.cards.splice(index, 1)
-        return slot.card
-    }
-    remove_all_cards() {
-        this.cards.length = 0
-        remove_all_children(this.hand_node)
-    }
-    get number_of_cards() {
-        return this.cards.length
-    }
-    /// Get the Card value of a card. (the first one if not provided)
-    card(index) {
-        return this.cards[index || 0].card
-    }
-    /// Get the CardSlot for a card. (the first one if not provided)
-    slot(index) {
-        return this.cards[index || 0]
-    }
-    get lost() {
-        return this._lost
-    }
-    set_lost(lost) {
-        if (lost) {
-            for (const slot of this.cards) {
-                slot.show()
-            }
-            this.hand_node.parentNode.classList.add('lost')
-        } else {
-            this.hand_node.parentNode.classList.remove('lost')
-        }
-        this._lost = lost
-    }
-    get immune() {
-        return this._immune
-    }
-    set_immune(immune) {
-        this._immune = immune
-        if (immune) {
-            this.hand_node.parentNode.classList.add('immune')
-        } else {
-            this.hand_node.parentNode.classList.remove('immune')
-        }
-    }
 }
 
 function sleep(ms) {
@@ -259,7 +20,7 @@ async function select_random_card(player) {
 }
 
 async function select_random_player(player, players) {
-    if (players.every(p => p == player || p.immune)) {
+    if (players.every(p => p === player || p.immune)) {
         return player
     }
 
@@ -269,8 +30,18 @@ async function select_random_player(player, players) {
     let index
     do {
         index = Math.floor(Math.random()*players.length)
-    } while (players[index].immune);
+    } while (players[index].immune || players[index] === player);
     return players[index]
+}
+
+async function guess_random_player(player, players) {
+    const guess_on = await select_random_player(player, players)
+    const card_index = 0 // Math.floor(Math.random()*guess_on.number_of_cards)
+    let value
+    do {
+        value = Math.floor(Math.random()*(13-7))+7
+    } while (guess_on == player && value == guess_on.card(card_index).value);
+    return [guess_on, CARD_BY_VALUE[value]]
 }
 
 async function click_card(player) {
@@ -329,7 +100,7 @@ async function click_player(player, players) {
             node = node.parentNode
         }
         for (let p of players) {
-            if (p.hand_id === node.id) {
+            if (p.hand_node === node) {
                 resolve_player(p)
                 return
             }
@@ -355,23 +126,50 @@ async function click_player(player, players) {
     // disable selecting
     for (let p of players) {
         p.hand_node.classList.remove('pick-one')
-        p.hand_node.removeEventListener('click', player_clicked)
+        p.hand_node.removeEventListener('mousedown', player_clicked)
     }
     return selected_player
 }
 
-function deal_cards(players, deck, removed_card) {
+async function click_guess(player, players) {
+    // store the resolve callback outside of the promise callback
+    let resolve_guess
+    let select_guess = new Promise(resolve => {
+        resolve_guess = resolve
+    })
+
+    // enable selecting
+    let all_immune = true
+    for (let p of players) {
+        if (p != player && !p.immune) {
+            p.slot().make_guessable(guess=>resolve_guess([p, guess]))
+            all_immune = false
+        }
+    }
+    if (all_immune) {
+        player.slot().make_guessable(guess=>resolve_guess([player, guess]))
+    }
+
+    let guess = await select_guess
+    // disable selecting
+    for (let p of players) {
+        p.slot().render_default()
+    }
+    return guess
+}
+
+async function deal_cards(players, deck, removed_card, parent) {
     deck.set_cards(shuffled_deck())
     console.log('cards in deck before dealing: ' + deck.number_of_cards)
 
-    // remove one card when less than four players
-    if (players.length < 4) {
-        removed_card.set_card(deck.draw_card())
-    }
-
     // give cards
     for (const player of players) {
-        player.add_card(deck.draw_card())
+        await animate_move(deck, player.add_card(), parent, 0.7)
+    }
+
+    // remove one card when less than four players
+    if (players.length < 4) {
+        await animate_move(deck, removed_card, parent, 0.3)
     }
 
     console.log('cards in deck after dealing: ' + deck.number_of_cards)
@@ -393,42 +191,40 @@ function can_play(player, index) {
     return true
 }
 
-async function take_effect(card, played_by, players, deck, played_cards) {
+async function take_effect(card, played_by, players, deck, played_cards, parent_node) {
     const SHOW_RESULT_DURATION = 750
     if (card.name == 'J') {
         const swap_with = await played_by.select_player(played_by, players)
-        // TODO reject swapping with one self?
-        swap_with.add_card(played_by.remove_card(0))
-        played_by.add_card(swap_with.remove_card(0))
-
-        // show the card that the opponent got
-        played_by.view_others_card(swap_with.slot(0))
-        played_by.slot(0).highlight()
-        await sleep(SHOW_RESULT_DURATION)
-        swap_with.slot(0).render_default()
-        played_by.slot(0).render_default()
+        if (swap_with == played_by) {
+            // TODO rotate to show swapping with oneself
+            played_by.slot(0).highlight()
+            await sleep(SHOW_RESULT_DURATION)
+            played_by.slot(0).render_default()
+        } else {
+            // swap simultaneously
+            const swapped = Promise.all([
+                animate_move(played_by.slot(0), swap_with.add_card(), parent_node, 1.2),
+                animate_move(swap_with.slot(0), played_by.add_card(), parent_node, 1.2)
+            ])
+            // remove empty slots early so that it doesn't look like there'll be two cards
+            played_by.remove_card(0)
+            swap_with.remove_card(0)
+            await swapped
+        }
     } else if (card.name == '10' && deck.number_of_cards > 0) {
         const to_draw = await played_by.select_player(played_by, players)
-        played_cards.set_card(to_draw.remove_card(0))
+        await animate_move(to_draw.slot(0), played_cards, parent_node, 0.6)
+        to_draw.remove_card(0)
         if (played_cards.card.name == 'K') {
-            to_draw.set_lost(true)
             return to_draw
         }
-        to_draw.add_card(deck.draw_card())
-
-        // show which player
-        to_draw.slot(0).highlight()
-        played_cards.highlight()
-        await sleep(SHOW_RESULT_DURATION)
-        to_draw.slot(0).render_default()
-        played_cards.render_default()
+        await animate_move(deck, to_draw.add_card(), parent_node, 0.6)
     } else if (card.name == '9') {
-        played_by.set_immune(true)
+        played_by.make_immune()
         await sleep(SHOW_RESULT_DURATION/2)
     } else if (card.name == '8') {
         const duel_with = await played_by.select_player(played_by, players)
         if (played_by.card(0).value > duel_with.card(0).value) {
-            duel_with.set_lost(true)
             return duel_with
         } else if (played_by.card(0).value < duel_with.card(0).value) {
             // show what the other player had
@@ -436,7 +232,6 @@ async function take_effect(card, played_by, players, deck, played_cards) {
             await sleep(SHOW_RESULT_DURATION)
             duel_with.slot(0).render_default()
 
-            played_by.set_lost(true)
             return played_by
         } else {
             // show that the other player had the same card
@@ -450,6 +245,15 @@ async function take_effect(card, played_by, players, deck, played_cards) {
         played_by.view_others_card(to_view.slot(0))
         await sleep(SHOW_RESULT_DURATION*2)
         to_view.slot(0).render_default()
+    } else if (card.name == '6') {
+        const [guessed_on, guess] = await played_by.guess_card(played_by, players)
+        if (guessed_on.card(0).value == guess.value) {
+            return guessed_on
+        }
+        // show the wrong guess for everyone
+        guessed_on.slot(0).show_its_not(guess)
+        await sleep(SHOW_RESULT_DURATION)
+        guessed_on.slot(0).render_default()
     }
     return null
 }
@@ -458,48 +262,70 @@ async function run_game(opponents) {
     set_message('')
     const players = [new Player(
             'Du',
-            'your-cards',
+            'you',
             false,
             card=>card.show(),
             set_message,
             click_card,
-            click_player
+            click_player,
+            click_guess
     )]
     for (let n=1; n<=opponents; n++) {
         players.push(new Player(
                 'Motstander '+n,
-                'opponent'+n+'-cards',
+                'opponent'+n,
                 true,
                 card=>card.highlight(),
                 ()=>{},
                 select_random_card,
-                select_random_player
+                select_random_player,
+                guess_random_player
         ))
     }
 
     const removed_card = new CardSlot(document.getElementById('removed-card'), true)
     const played_cards = new CardSlot(document.getElementById('played-cards'), false)
     const deck = new Deck(document.getElementById('undealt-cards'))
+    const parent = document.getElementById('table')
 
-    deal_cards(players, deck, removed_card)
+    await deal_cards(players, deck, removed_card, parent)
     let players_turn = 0
 
     while (deck.number_of_cards > 0 && players.length > 1) {
-        players[players_turn].set_immune(false)
-        const draws = deck.draw_card()
-        players[players_turn].add_card(draws)
+        players[players_turn].make_active()
+        // draw a card from the deck and add it to the hand
+        const draws = await animate_move(deck, players[players_turn].add_card(), parent, 0.8)
 
         const index = await players[players_turn].select_card_to_play(players[players_turn])
-        const plays = players[players_turn].remove_card(index)
-        played_cards.set_card(plays)
+        const plays = await animate_move(
+                players[players_turn].slot(index),
+                played_cards,
+                parent,
+                0.7
+        )
+        players[players_turn].remove_card(index)
         console.log(players[players_turn].name+' plays '+plays.name)
 
-        const lost = await take_effect(plays, players[players_turn], players, deck, played_cards)
+        const lost = await take_effect(
+                plays,
+                players[players_turn],
+                players,
+                deck,
+                played_cards,
+                parent
+        )
         if (lost) {
+            lost.make_lost()
             set_message(lost.name+' tapte')
             console.log(lost.name+' lost')
-            players.splice(players.indexOf(lost), 1)
-            players_turn--
+            const lost_index = players.indexOf(lost)
+            players.splice(lost_index, 1)
+            // undo later increment if the player at the same index is now a different one
+            if (lost_index <= players_turn) {
+                players_turn--
+            }
+        } else if (!players[players_turn].immune) {
+            players[players_turn].make_idle()
         }
         players_turn = (players_turn+1) % players.length
     }
