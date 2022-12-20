@@ -44,6 +44,15 @@ async function guess_random_player(player, players) {
     return [guess_on, CARD_BY_VALUE[value]]
 }
 
+function tell_action(message) {
+    const node = document.getElementById('buttons');
+    if (message) {
+        node.textContent = message
+    } else {
+        node.textContent = ''
+    }
+}
+
 async function click_card(player) {
     // store the resolve callback outside of the promise callback
     let resolve_selected
@@ -73,7 +82,9 @@ async function click_card(player) {
     }
     player.hand_node.classList.add('pick-one')
 
+    tell_action("Velg et kort å spille.")
     let index = await valid_selected
+    tell_action()
 
     // disable selecting
     player.hand_node.classList.remove('pick-one')
@@ -81,7 +92,6 @@ async function click_card(player) {
         player.slot(i).node.removeEventListener('click', card_clicked)
     }
 
-    //await new Promise(resolve=>{})
     return index
 }
 
@@ -122,7 +132,9 @@ async function click_player(player, players) {
     if (all_immune) {
         return player
     }
+    tell_action('Velg en motspillers kort.')
     let selected_player = await select_player
+    tell_action()
     // disable selecting
     for (let p of players) {
         p.hand_node.classList.remove('pick-one')
@@ -150,7 +162,10 @@ async function click_guess(player, players) {
         player.slot().make_guessable(guess=>resolve_guess([player, guess]))
     }
 
+    tell_action("Gjett et tall på en motspillers kort.")
     let guess = await select_guess
+    tell_action()
+
     // disable selecting
     for (let p of players) {
         p.slot().render_default()
@@ -169,7 +184,7 @@ async function deal_cards(players, deck, removed_card, parent) {
 
     // remove one card when less than four players
     if (players.length < 4) {
-        await animate_move(deck, removed_card, parent, 0.3)
+        await animate_move(deck, removed_card, parent, 0.5)
     }
 
     console.log('cards in deck after dealing: ' + deck.number_of_cards)
@@ -196,10 +211,7 @@ async function take_effect(card, played_by, players, deck, played_cards, parent_
     if (card.name == 'J') {
         const swap_with = await played_by.select_player(played_by, players)
         if (swap_with == played_by) {
-            // TODO rotate to show swapping with oneself
-            played_by.slot(0).highlight()
-            await sleep(SHOW_RESULT_DURATION)
-            played_by.slot(0).render_default()
+            await played_by.slot(0).spin(1)
         } else {
             // swap simultaneously
             const swapped = Promise.all([
@@ -211,11 +223,11 @@ async function take_effect(card, played_by, players, deck, played_cards, parent_
             swap_with.remove_card(0)
             await swapped
         }
-    } else if (card.name == '10' && deck.number_of_cards > 0) {
+    } else if (card.name == '10') {
         const to_draw = await played_by.select_player(played_by, players)
         await animate_move(to_draw.slot(0), played_cards, parent_node, 0.6)
         to_draw.remove_card(0)
-        if (played_cards.card.name == 'K') {
+        if (played_cards.card.name == 'K' || deck.number_of_cards == 0) {
             return to_draw
         }
         await animate_move(deck, to_draw.add_card(), parent_node, 0.6)
@@ -224,7 +236,9 @@ async function take_effect(card, played_by, players, deck, played_cards, parent_
         await sleep(SHOW_RESULT_DURATION/2)
     } else if (card.name == '8') {
         const duel_with = await played_by.select_player(played_by, players)
-        if (played_by.card(0).value > duel_with.card(0).value) {
+        if (duel_with === played_by) {
+            await played_by.slot(0).spin(1)
+        } else if (played_by.card(0).value > duel_with.card(0).value) {
             return duel_with
         } else if (played_by.card(0).value < duel_with.card(0).value) {
             // show what the other player had
@@ -240,11 +254,19 @@ async function take_effect(card, played_by, players, deck, played_cards, parent_
             duel_with.slot(0).render_default()
         }
     } else if (card.name == '7') {
+        // if this is the last play it's pointless to look because you'll see it immediately anyway
+        if (deck.number_of_cards = 0) {
+            return null
+        }
         const to_view = await played_by.select_player(played_by, players)
-        // show the card
-        played_by.view_others_card(to_view.slot(0))
-        await sleep(SHOW_RESULT_DURATION*2)
-        to_view.slot(0).render_default()
+        if (to_view === played_by) {
+            await played_by.slot(0).spin(1)
+        } else {
+            // show the card
+            await to_view.slot(0).flip('X', !played_by.hidden_cards, 1)
+            await sleep(SHOW_RESULT_DURATION)
+            await to_view.slot(0).flip('X', !to_view.hidden_cards, 1)
+        }
     } else if (card.name == '6') {
         const [guessed_on, guess] = await played_by.guess_card(played_by, players)
         if (guessed_on.card(0).value == guess.value) {
@@ -315,6 +337,9 @@ async function run_game(opponents) {
                 parent
         )
         if (lost) {
+            if (lost.number_of_cards > 0) {
+                await lost.slot(0).flip('Y', true, 0.5)
+            }
             lost.make_lost()
             set_message(lost.name+' tapte')
             console.log(lost.name+' lost')

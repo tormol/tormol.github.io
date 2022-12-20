@@ -128,20 +128,28 @@ footer {
     max-width: 80vw;
 }
 #message, #buttons {
-    font-size: 80%;
+    font-size: 70%;
     min-height: 1.5em;
 }
 
 .card {
+    padding: 0.18em;
+    border-style: solid;
     border-radius: 0.5em;
+    border-color: #eec;
     /*use border as the edge around the center until I make images*/
     /*to make this work nicely, make the border not increase the size of the element*/
     box-sizing: border-box;
-    border-width: 0.2em;
-    border-style: solid;
-    padding: 0.18em;
 
-    border-color: #eec;
+    text-align: center;
+    text-justify: distribute;
+}
+.card.no-card {
+    /*be invisible, but need the position for animations*/
+    visibility: hidden;
+}
+.card.visible-card {
+    border-width: 0.2em;
     background-color: #ee7;
     color: #c44;
 
@@ -150,16 +158,53 @@ footer {
     flex-direction: column;
     justify-content: space-between;
 }
-.no-card {
-    /*be invisible, but need the position for animations*/
-    visibility: hidden;
+.card.visible-card p {
+    margin: 0;
 }
-.hidden-card {
+.card.visible-card p:last-child {
+    rotate: 180deg;
+}
+.card.hidden-card, .card.guessable-card, .card.wrong-guess-card {
     border-width: 0.15em;
     background-color: #a04b19;
+    padding: 0;
+    display: grid;
+    align-items: center;
+    justify-items: center;
 }
-.highlighted-card {
+.card.guessable-card {
+    grid-template-columns: 50% 50%;
+}
+.card.guessable-card p {
+    color: #ff0;
+    font-size: 0.5em;
+    padding: 0;
+    margin: 0;
+    height: 1.3em;
+    width: 1.5em;
+    background-color: #bf6a3c;
+    border-radius: 0.2em;
+    border: #ab805f solid 0.05em;
+}
+.card.guessable-card p:hover {
+    background-color: #d1a38a;
+    color: #ff6;
+    cursor: pointer;
+}
+.card.guessable-card p:first-child {
+    visibility: hidden;
+}
+.card.wrong-guess-card p {
+    color: #f00;
+    font-size: 1.8em;
+}
+
+.card.highlighted-card {
     filter: brightness(120%);
+}
+.pick-one .card:hover {
+    filter: brightness(150%);
+    cursor: pointer;
 }
 
 #removed-card {
@@ -182,32 +227,6 @@ footer {
     border-width: 0;
     background-color: #080;
 }
-
-.card p {
-    margin: 0;
-}
-.card p:last-child {
-    rotate: 180deg;
-}
-.card.hidden-card p {
-    color: #ff0;
-    font-size: 50%;
-}
-.card p.wrong-guess {
-    color: #f00;
-    font-size: 180%;
-    height: 100%;
-    text-justify: distribute;
-}
-.card.hidden-card p:last-child {
-    rotate: 0deg;
-}
-
-.pick-one .card:hover, .card.hidden-card p:hover {
-    filter: brightness(150%);
-    cursor: pointer;
-}
-
 #moving-card {
     position: absolute;
     z-index: 13;

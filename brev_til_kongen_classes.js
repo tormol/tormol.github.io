@@ -60,6 +60,8 @@ function remove_all_children(node) {
     }
 }
 
+const DEFAULT_ANIMATION_SPEED = 500
+
 /// A viewed card.
 /// It is used both for cards in the hand of a player, and for the cards on the table.
 class CardSlot {
@@ -71,6 +73,7 @@ class CardSlot {
         this._node = node
         this._card = card || null
         this.default_hidden = default_hidden
+        node.className = 'card' // remove any other
         this.render_default()
     }
     get node() {
@@ -92,9 +95,7 @@ class CardSlot {
     /// This removes the card but not the node
     no_card() {
         this._card = null
-        remove_all_children(this.node)
-        this.node.classList.remove('hidden-card')
-        this.node.classList.add('no-card')
+        this.prepare_state('no-card')
     }
     /// Return the card and make the slot empty.
     /// Throws if the slot is already empty.
@@ -116,24 +117,71 @@ class CardSlot {
         return this._card
     }
 
+    prepare_state(state_class) {
+        if (this.state_class) {
+            this.node.classList.replace(this.state_class, state_class)
+        } else {
+            this.node.classList.add(state_class)
+        }
+        this.state_class = state_class
+        remove_all_children(this.node)
+    }
     hide() {
         this.hidden = true
-        if (this.has_card()) {
-            this.node.classList.remove('no-card')
-            this.node.classList.add('hidden-card')
-            remove_all_children(this.node)
+        if (this._card) {
+            this.prepare_state('hidden-card')
         }
     }
     show() {
         this.hidden = false
-        if (this.has_card()) {
-            this.node.classList.remove('no-card')
-            this.node.classList.remove('hidden-card')
-            remove_all_children(this.node)
+        if (this._card) {
+            this.prepare_state('visible-card')
             this.node.appendChild(document.createElement('p')).textContent = this._card.name
             this.node.appendChild(document.createElement('p')).textContent = this._card.icon
             this.node.appendChild(document.createElement('p')).textContent = this._card.name
         }
+    }
+    async flip(axis, show, speed_factor) {
+        await new Promise(animation_complete => {
+            const animation = this.node.animate([
+                {// from
+                    transform: 'scale'+axis+'(100%)',
+                },
+                {// to
+                    transform: 'scale'+axis+'(0%)',
+                }
+            ], DEFAULT_ANIMATION_SPEED*speed_factor/2)
+            animation.onfinish = animation_complete
+        })
+        if (show) {
+            this.show()
+        } else {
+            this.hide()
+        }
+        await new Promise(animation_complete => {
+            const animation = this.node.animate([
+                {// from
+                    transform: 'scale'+axis+'(0%)',
+                },
+                {// to
+                    transform: 'scale'+axis+'(100%)',
+                }
+            ], DEFAULT_ANIMATION_SPEED*speed_factor/2)
+            animation.onfinish = animation_complete
+        })
+    }
+    async spin(speed_factor) {
+        await new Promise(animation_complete => {
+            const animation = this.node.animate([
+                {// from
+                    transform: 'rotate(0deg)',
+                },
+                {// to
+                    transform: 'rotate(360deg)',
+                }
+            ], DEFAULT_ANIMATION_SPEED*speed_factor)
+            animation.onfinish = animation_complete
+        })
     }
     highlight() {
         this._highlight = true
@@ -143,30 +191,34 @@ class CardSlot {
     /// The callback is passed two parameters when a button is clicked:
     /// 1. a Card representing the guessed value, 2: the args argument passed to this function
     make_guessable(callback, args) {
-        this.hide()
-        for (const value in CARD_BY_VALUE) {
-            if (value != 6) {
-                const card = CARD_BY_VALUE[value]
-                this.node.appendChild(document.createElement('p')).textContent = card.name
-                // this callback doesn't need to be removable
-                // because the nodes will be removed when guessing is finished
-                this.node.lastChild.addEventListener('mousedown', ()=>callback(card, args))
+        if (this.has_card) {
+            this.prepare_state('guessable-card')
+            for (const value in CARD_BY_VALUE) {
+                if (value == 6) {
+                    this.node.appendChild(document.createElement('p'))
+                } else {
+                    const card = CARD_BY_VALUE[value]
+                    this.node.appendChild(document.createElement('p')).textContent = card.name
+                    // this callback doesn't need to be removable
+                    // because the nodes will be removed when guessing is finished
+                    this.node.lastChild.addEventListener('mousedown', ()=>callback(card, args))
+                }
             }
         }
     }
     /// Hide the card and show which guess was incorrect
     show_its_not(card) {
-        this.hide()
-        const inner = this.node.appendChild(document.createElement('p'))
-        inner.textContent = card.name
-        inner.classList.add('wrong-guess')
+        if (this._card) {
+            this.prepare_state('wrong-guess-card')
+            this.node.appendChild(document.createElement('p')).textContent = card.name
+        }
     }
     /// Remove highlight and reset to default show/hide.
     render_default() {
         this._highlight = false
         this.node.classList.remove('highlighted-card')
 
-        if (!this.has_card()) {
+        if (!this._card) {
             this.no_card()
             this.hidden = this.default_hidden
         } else if (this.default_hidden) {
@@ -307,16 +359,15 @@ async function animate_move(from, to, common_parent_node, speed_factor) {
     const animation = moving.node.animate([
         {// from
             left: (from_rect.left-outer_rect.left)+'px',
-            top: (from_rect.top-outer_rect.top)+'px'
+            top: (from_rect.top-outer_rect.top)+'px',
+            rotate: window.getComputedStyle(from.node).getPropertyValue('rotate'),
         },
         {// to
             left: (to_rect.left-outer_rect.left)+'px',
-            top: (to_rect.top-outer_rect.top)+'px'
+            top: (to_rect.top-outer_rect.top)+'px',
+            rotate: window.getComputedStyle(to.node).getPropertyValue('rotate'),
         }
-    ], {
-        duration: 500*speed_factor,
-        iterations: 1
-    })
+    ], DEFAULT_ANIMATION_SPEED*speed_factor)
 
     const animation_done = new Promise(animation_complete => {
         animation.onfinish = animation_complete
