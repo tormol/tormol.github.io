@@ -78,8 +78,6 @@ footer {
     border-width: 0.02em;
     border-radius: 0.2em;
     margin: 0.5em;
-    min-height: 6.5em;
-    min-width: 7em;
 }
 .player>p {
     font-size: 50%;
@@ -97,11 +95,6 @@ footer {
     background-color: #8c8;
     color: #662;
 }
-.card {
-    height: 5em;
-    width: 3em;
-    margin: 0.2em;
-}
 
 #table, .player, .opponent {
     display: flex;
@@ -116,24 +109,64 @@ footer {
     flex-direction: row;
     justify-content: center;
 }
-.hand {
-    width: 7em;
-}
-#center {
-    width: 7.5em;
-    justify-content: space-around;
-}
 #opponents {
     overflow-x: scroll;
-    max-width: 80vw;
+    justify-content: space-between;
+    margin-left: 1.5em;
+    margin-right: 1.5em;
 }
 #message, #buttons {
     font-size: 70%;
     min-height: 1.5em;
 }
 
+/*card-related sizes*/
 .card {
-    padding: 0.18em;
+    height: 5em; /*9cm*/
+    width: 3.3em; /*6cm*/
+    margin: 0.2em;
+}
+.hand {
+    min-width: 7.4em; /*(0.2*2+3.3)*2*/
+    min-height: 5.4em; /*5+0.2*2*/
+}
+#center {
+    width: 7.4em;
+    justify-content: space-around;
+}
+#removed-card {
+    rotate: 90deg;
+    position: absolute;
+    margin-left: -7.4em;
+    /*put below undealt cards but above no cards*/
+    z-index: 11;
+}
+#removed-card.no-card {
+    z-index: 9;
+}
+#undealt-cards {
+    z-index: 12;
+}
+
+#undealt-cards.no-card, #played-cards.no-card {
+    z-index: 10;
+    /*show as empty slot*/
+    visibility: visible;
+    border-width: 0;
+    background-color: #080;
+}
+#moving-card {
+    position: absolute;
+    z-index: 13;
+}
+.card.no-card {
+    /*be invisible, but need the position for animations*/
+    visibility: hidden;
+}
+
+/*card rendering*/
+.card {
+    padding: 0.15em;
     border-style: solid;
     border-radius: 0.5em;
     border-color: #eec;
@@ -144,26 +177,52 @@ footer {
     text-align: center;
     text-justify: distribute;
 }
-.card.no-card {
-    /*be invisible, but need the position for animations*/
-    visibility: hidden;
-}
 .card.visible-card {
-    border-width: 0.2em;
-    background-color: #ee7;
+    border-width: 0;
+    background-color: #fff;
     color: #c44;
 
     /*vertically justify the text*/
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    display: grid;
+    grid-template-areas:
+        "a . b"
+        ". e ."
+        "c . d";
+    grid-template-rows: 0.8em 1fr 0.8em;
+    grid-template-columns: 0.8em 1fr 0.8em;
+    align-items: stretch;
+    justify-items: stretch;
 }
 .card.visible-card p {
     margin: 0;
+    font-size: 0.7em;
+    text-align: center;
 }
-.card.visible-card p:last-child {
+.card.visible-card p:nth-child(1) {
+    grid-area: a;
+}
+.card.visible-card p:nth-child(2) {
+    grid-area: b;
+}
+.card.visible-card p:nth-child(3) {
     rotate: 180deg;
+    grid-area: c;
 }
+.card.visible-card p:nth-child(4) {
+    rotate: 180deg;
+    grid-area: d;
+}
+.card.visible-card div:last-child {
+    grid-area: e;
+    background-color: #ee7;
+    border: #664 solid 0.02em;
+    text-justify: distribute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 1.5em;
+}
+
 .card.hidden-card, .card.guessable-card, .card.wrong-guess-card {
     border-width: 0.15em;
     background-color: #a04b19;
@@ -205,29 +264,4 @@ footer {
 .pick-one .card:hover {
     filter: brightness(150%);
     cursor: pointer;
-}
-
-#removed-card {
-    rotate: 90deg;
-    position: absolute;
-    margin-left: -7em;
-    /*put below undealt cards but above no cards*/
-    z-index: 11;
-}
-#removed-card.no-card {
-    z-index: 9;
-}
-#undealt-cards {
-    z-index: 12;
-}
-#undealt-cards.no-card, #played-cards.no-card {
-    z-index: 10;
-    /*show as empty slot*/
-    visibility: visible;
-    border-width: 0;
-    background-color: #080;
-}
-#moving-card {
-    position: absolute;
-    z-index: 13;
 }

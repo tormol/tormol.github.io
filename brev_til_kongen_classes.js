@@ -136,9 +136,11 @@ class CardSlot {
         this.hidden = false
         if (this._card) {
             this.prepare_state('visible-card')
-            this.node.appendChild(document.createElement('p')).textContent = this._card.name
-            this.node.appendChild(document.createElement('p')).textContent = this._card.icon
-            this.node.appendChild(document.createElement('p')).textContent = this._card.name
+            for (let i=0; i<4; i++) {
+                this.node.appendChild(document.createElement('p')).textContent = this._card.name
+            }
+            const center = this.node.appendChild(document.createElement('div'))
+            center.appendChild(document.createElement('p')).textContent = this._card.icon
         }
     }
     async flip(axis, show, speed_factor) {
