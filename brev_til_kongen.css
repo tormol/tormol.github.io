@@ -111,9 +111,9 @@ footer {
 }
 #opponents {
     overflow-x: scroll;
-    justify-content: space-between;
-    margin-left: 1.5em;
-    margin-right: 1.5em;
+    justify-content: space-around;
+    margin-left: 0;
+    margin-right: 0;
 }
 #message, #buttons {
     font-size: 70%;
