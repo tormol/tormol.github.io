@@ -12,6 +12,28 @@ async function select_random_card(player) {
     // wait a bit
     await sleep(600)
 
+    if (player.number_of_cards == 1) {
+        return 0
+    }
+    let first = player.card(0).name
+    let second = player.card(1).name
+    if (first == 'K') {
+        return 0
+    } else if (second == 'K') {
+        return 1
+    } else if (first == 'Q' && (second == '10' || second == 'J')) {
+        return 0
+    } else if (second == 'Q' && (first == '10' || first == 'J')) {
+        return 1
+    } else if ((first == '6' || first == '7') && second == '8') {
+        return 0
+    } else if (first == '8' && (second == '6' || second == '7')) {
+        return 1
+    } else if (first == '6' && second == 'J') {
+        return 0
+    } else if (first == 'J' && second == '6') {
+        return 1
+    }
     let index
     do {
         index = Math.floor(Math.random()*player.number_of_cards)
