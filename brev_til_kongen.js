@@ -34,10 +34,7 @@ async function select_random_card(player) {
     } else if (first == 'J' && second == '6') {
         return 1
     }
-    let index
-    do {
-        index = Math.floor(Math.random()*player.number_of_cards)
-    } while (!can_play(player, index));
+    let index = Math.floor(Math.random()*player.number_of_cards)
     return index
 }
 
